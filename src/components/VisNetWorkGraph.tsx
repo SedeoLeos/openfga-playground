@@ -1,51 +1,125 @@
-import React from "react";
+'use client';
 
-import Graph from "react-graph-vis";
- 
-import "./styles.css";
-// need to import the vis network css in order to show tooltip
-import "./network.css";
- 
+import { useAppSelector } from '@/stores/store';
+import { graphBuilder } from '@openfga/frontend-utils';
+import { SchemaVersion } from '@openfga/frontend-utils/dist/constants/schema-version';
+import { GraphDefinition } from '@openfga/frontend-utils/dist/utilities/graphs';
+import { AuthorizationModel } from '@openfga/sdk';
+import { useEffect, useState } from 'react';
+import Graph from 'react-graph-vis';
+
 export default function VisNetWorkGraph() {
-  const graph = {
-    nodes: [
-      { id: 1, label: "Node 1", title: "node 1 tootip text" },
-      { id: 2, label: "Node 2", title: "node 2 tootip text" },
-      { id: 3, label: "Node 3", title: "node 3 tootip text" },
-      { id: 4, label: "Node 4", title: "node 4 tootip text" },
-      { id: 5, label: "Node 5", title: "node 5 tootip text" }
-    ],
-    edges: [
-      { from: 1, to: 2 },
-      { from: 1, to: 3 },
-      { from: 2, to: 4 },
-      { from: 2, to: 5 }
-    ]
-  };
- 
+  const [graphId, setGraphId] = useState<string | null>(null);
+  const [currentGraph, setCurrentGraph] = useState<GraphDefinition | null>(null);
+
+  useEffect(() => {
+    setGraphId(`graph-${new Date().toISOString()}`);
+  }, []);
+
+  const authorizationModel = useAppSelector(
+    (state) => state.authorizationModel.authorizationModel
+  );
+
+  useEffect(() => {
+    if (authorizationModel && graphId) {
+      const defaultModel: AuthorizationModel = {
+        id: 'test',
+        schema_version: SchemaVersion.OneDotOne,
+        type_definitions: [],
+        conditions: {},
+      };
+
+      const _authModel = authorizationModel ?? defaultModel;
+      const authorizationModelGraph = new graphBuilder.AuthorizationModelGraphBuilder(
+        _authModel, {
+        name: 'focus',
+        id: graphId,
+      }
+      );
+      setCurrentGraph(authorizationModelGraph.graph);
+    }
+  }, [authorizationModel, graphId]);
   const options = {
-    layout: {
-      hierarchical: true
+    nodes: {
+      shape: 'dot',
+      size: 16,
+      font: {
+        size: 14,
+        color: '#FFFFFF',
+      },
+      borderWidth: 2,
     },
     edges: {
-      color: "#000000"
+      width: 1,
+      color: '#4A4A4A',
+      smooth: {
+        enabled: true,
+        type: 'curvedCW',
+        roundness: 0.2
+      },
+      arrows: {
+        to: {
+          enabled: false,
+          scaleFactor: 0.5,
+          type: 'arrow'
+        }
+      }
     },
-    height: "500px"
+    physics: {
+      enabled: false
+    },
+    layout: {
+      improvedLayout: true,
+    },
+    groups: {
+      check: {
+        color: {
+          background: '#32CEA8',
+        },
+      },
+      default: {
+        color: {
+          background: '#32CEA8',
+          border: 'transparent',
+        },
+      },
+      type: {
+        color: {
+          background: '#908BFF',
+          border: 'transparent',
+        },
+      },
+      "nonassignable-relation": {
+        color: {
+          background: '#32CEA8',
+          border: 'transparent',
+        },
+      },
+      'store-name': {
+        color: {
+          background: '#626466',
+          border: 'transparent',
+        },
+        font: { color: '#FFFFFF' },
+      },
+    },
+    // autoResize: true,
   };
- 
-  const events = {
-    select: function(event) {
-      const { nodes, edges } = event;
-    }
-  };
+  if (!graphId || !currentGraph) return null;
   return (
-    <Graph
-      graph={graph}
-      options={options}
-      events={events}
-      getNetwork={network => {
-        //  if you want access to vis.js network api you can set the state in a parent component using this property
+    <div
+      className="w-full h-full bg-white"
+      style={{
+        backgroundImage:
+          "url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iMTZweCIgaGVpZ2h0PSIxNnB4IiB2aWV3Qm94PSIwIDAgMTYgMTYiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CiAgICA8IS0tIEdlbmVyYXRvcjogU2tldGNoIDYyICg5MTM5MCkgLSBodHRwczovL3NrZXRjaC5jb20gLS0+CiAgICA8dGl0bGU+R3JvdXA8L3RpdGxlPgogICAgPGRlc2M+Q3JlYXRlZCB3aXRoIFNrZXRjaC48L2Rlc2M+CiAgICA8ZyBpZD0iUGFnZS0xIiBzdHJva2U9Im5vbmUiIHN0cm9rZS13aWR0aD0iMSIgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj4KICAgICAgICA8ZyBpZD0iR3JvdXAiIGZpbGwtcnVsZT0ibm9uemVybyI+CiAgICAgICAgICAgIDxyZWN0IGlkPSJSZWN0YW5nbGUiIGZpbGw9IiMxNDE1MTciIHg9IjAiIHk9IjAiIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiI+PC9yZWN0PgogICAgICAgICAgICA8cmVjdCBpZD0iUmVjdGFuZ2xlIiBmaWxsPSIjMkYyRjJGIiB4PSI3IiB5PSI3IiB3aWR0aD0iMiIgaGVpZ2h0PSIyIj48L3JlY3Q+CiAgICAgICAgPC9nPgogICAgPC9nPgo8L3N2Zz4=)",
+        backgroundRepeat: 'repeat',
       }}
-    />
+    >
+      <Graph
+        identifier={graphId}
+        graph={currentGraph}
+        options={options}
+      />
+    </div>
   );
 }

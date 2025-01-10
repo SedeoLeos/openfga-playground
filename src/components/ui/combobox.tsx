@@ -19,32 +19,24 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 
-const frameworks = [
-  {
-    value: "next.js",
-    label: "Next.js",
-  },
-  {
-    value: "sveltekit",
-    label: "SvelteKit",
-  },
-  {
-    value: "nuxt.js",
-    label: "Nuxt.js",
-  },
-  {
-    value: "remix",
-    label: "Remix",
-  },
-  {
-    value: "astro",
-    label: "Astro",
-  },
-]
 
-export function Combobox() {
+type ComboboxProps = {
+  data?: { label: string; value: string }[],
+  onSelect?: (value: string) => void,
+  defaultValue: string
+}
+
+export function Combobox({ data = [], defaultValue, onSelect }: ComboboxProps) {
   const [open, setOpen] = React.useState(false)
-  const [value, setValue] = React.useState("")
+  const [value, setValue] = React.useState(defaultValue)
+  React.useEffect(() => {
+    if(defaultValue){
+      setValue(defaultValue)
+      onSelect?.(defaultValue)
+    }
+  }, [defaultValue,onSelect])
+
+
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -56,7 +48,7 @@ export function Combobox() {
           className="w-[200px] justify-between !bg-transparent"
         >
           {value
-            ? frameworks.find((framework) => framework.value === value)?.label
+            ? data.find((framework) => framework.value === value)?.label
             : "Select framework..."}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
@@ -67,12 +59,13 @@ export function Combobox() {
           <CommandList>
             <CommandEmpty>No framework found.</CommandEmpty>
             <CommandGroup>
-              {frameworks.map((framework) => (
+              {data.map((framework,index) => (
                 <CommandItem
-                  key={framework.value}
+                  key={index}
                   value={framework.value}
                   onSelect={(currentValue) => {
                     setValue(currentValue === value ? "" : currentValue)
+                    onSelect?.(currentValue)
                     setOpen(false)
                   }}
                 >

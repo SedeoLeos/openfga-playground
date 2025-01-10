@@ -1,113 +1,83 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
+import { getAuthorizationModel } from '@/actions/open-fga.action';
+import { setAuthorizationModelState } from '@/stores/slice';
+import { useAppDispatch, useAppSelector } from '@/stores/store';
 import Editor, { Monaco } from '@monaco-editor/react';
-import React from 'react'
-import { Button } from './ui/button';
-import PasteIcon from './icons/paste';
 import { theming, tools, } from '@openfga/frontend-utils';
 import { SchemaVersion } from '@openfga/frontend-utils/dist/constants/schema-version';
+import { transformer } from '@openfga/syntax-transformer';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import PasteIcon from './icons/Paste';
+import { Button } from './ui/button';
+import { useRef } from 'react';
 
-const defaultValue = `
-model
-  schema 1.1
-  type user
-  type application
-  type system
-    relations
-      define sys_admin: [user,application]
-  type org
-    relations
-      define parent: [system]
-      define owner: [user]
-      define admin: [user] or owner or sys_admin from parent
-      define can_modify: admin
-      define can_manage_roles: admin
-      define org_editor: [user,  role#assignee]  or admin
-      define org_viewer: [user,  role#assignee]  or admin
-      define org_remover: [user,  role#assignee]  or admin
-
-    ### BEGIN ----- collaborator ---------
-
-      define collaborator_creator:  [user,  role#assignee]  or admin
-      define collaborator_editor: [user,  role#assignee]  or admin
-      define collaborator_remover:  [user,  role#assignee]  or admin
-      define collaborator_viewer: [user,  role#assignee]  or collaborator_editor or collaborator_creator or collaborator_remover or contract_viewer
-
-    ### END ----- collaborator ---------
-
-    ### BEGIN ----- contract ---------
-
-      define contract_creator:  [user,  role#assignee]  or admin
-      define contract_remover:  [user,  role#assignee]  or admin
-      define contract_editor: [user, role#assignee]  or admin
-      define contract_viewer: [user, role#assignee]  or contract_editor or contract_remover or contract_creator
-
-    ### END ----- contract ---------
-
-    ### BEGIN ----- salary ---------
-      define salary_creator:  [user,  role#assignee]  or admin
-      define salary_remover:  [user,  role#assignee]  or admin
-      define salary_editor: [user,  role#assignee]  or admin
-      define salary_viewer: [user,  role#assignee]  or salary_editor or salary_remover or salary_creator
-
-    ### END ----- salary ---------
-  
-  type collaborator
-    relations
-      define org: [org]
-      define owner: [user]
-      define edit: [user] or collaborator_editor from org or owner
-      define view: [user] or edit or collaborator_viewer from org or owner
-      define remove: [user] or edit or collaborator_remover from org or owner
-      define contract_viewer: [user] or owner or contract_viewer from org
-
-
-  type contract
-    relations
-        define  org: [org]
-        define  view_collaborator: [collaborator]
-        define  owner: [user]
-        define  edit: [user] or contract_editor from org or owner
-        define  view: [user] or edit or contract_viewer from org or owner
-        define  remove:  [user] or contract_remover from org or owner
-
-
-
-  type salary
-    relations
-        define  org: [org]
-        define  contract: [contract]
-        define  edit: [user] or salary_editor from org
-        define  view: [user] or edit or salary_viewer from org
-        define  remove: [user] or edit or salary_remover from org
-  type payslip
-
-  type role
-    relations
-      define assignee: [user]`
+const defaultValueCONST = `slaega`
 
 
 
 function MonacoEditor() {
 
+
+
     const handleEditorDidMount = (editor: unknown, monaco: Monaco) => {
         tools.MonacoExtensions.registerDSL(monaco, SchemaVersion.OneDotTwo, {
             documentationMap: {}
         })
-        console.log(tools.MonacoExtensions.buildMonacoTheme(theming.supportedThemes['openfga-dark']))
         monaco.editor.defineTheme(theming.SupportedTheme.OpenFgaDark, tools.MonacoExtensions.buildMonacoTheme(theming.supportedThemes['openfga-dark']));
         // Appliquer le thème
         monaco.editor.setTheme(theming.SupportedTheme.OpenFgaDark);
     };
+    const currentStoreState = useAppSelector((state) => state.storeFga.currentStore);
+    const authorizationModelState = useAppSelector((state) => state.authorizationModel.authorizationModel);
+    const dispatch = useAppDispatch();
+
+    const dslValue = useMemo(() => {
+        if (!authorizationModelState) return defaultValueCONST;
+        return transformer.transformJSONToDSL(authorizationModelState);
+    }, [authorizationModelState]);
+
+    const updateValue = useCallback(async () => {
+        if (!currentStoreState) return
+        const authorizationModel = await getAuthorizationModel(currentStoreState.id)
+        if (authorizationModel) {
+            dispatch(setAuthorizationModelState(authorizationModel))
+        }
+    }, [currentStoreState, dispatch]);
+
+    const jsonValue = useMemo(() => {
+        if (!authorizationModelState) return defaultValueCONST;
+        return transformer.transformDSLToJSON(dslValue);
+    }, [authorizationModelState, dslValue]);
+    const [currentDls, setCurrentDls] = useState<string>(dslValue)
+
+
+    useEffect(() => {
+
+        updateValue()
+    }, [currentStoreState, updateValue])
+
+    const copyToClipboard = async (text: string) => {
+        const result = await navigator.clipboard.writeText(text)
+        return result;
+    }
+    const TypeNumber = (): string => {
+        if (authorizationModelState) return `(${authorizationModelState.type_definitions.length} Types)`
+        return ""
+    }
+    const handleEditorSave = () => {
+
+    }
     return (
-        <div className='max-h-[600px] flex flex-1 flex-col'>
+        <div className='max-h-[500px] min-h-[500px] flex flex-1 flex-col'>
             <div className='flex justify-between items-center px-5'>
-                <div className='text-white'><span>Authorization Model</span> (4 types)</div>
+                <div className='text-white'><span>Authorization Model</span> {TypeNumber()}</div>
                 <div className='flex gap-4'>
-                    <Button className='!bg-transparent'>
+                    <Button className='!bg-transparent' onClick={() => copyToClipboard(jsonValue)}>
                         <PasteIcon />
                         <span >JSON</span>
                     </Button>
-                    <Button className='!bg-transparent'>
+                    <Button className='!bg-transparent' onClick={() => copyToClipboard(dslValue)}>
                         <PasteIcon />
                         <span >DLS</span>
                     </Button>
@@ -116,13 +86,19 @@ function MonacoEditor() {
             <Editor
                 theme={'openfga-dark'}
                 onMount={handleEditorDidMount}
-                className='w-full'
                 defaultLanguage="dsl.openfga"
-                defaultValue={defaultValue}
+                defaultValue={defaultValueCONST}
+                value={dslValue}
+                onChange={(value) => {
+                    if (value) {
+                        setCurrentDls(value)
+
+                    }
+                }}
 
             />
-            <div className='p-5 flex justify-end items-center'>
-                <Button>SAVE</Button>
+            <div className='p-2 flex justify-end items-center'>
+                <Button className='bg-indigo-500 hover:bg-indigo-600' onClick={() => handleEditorSave()}>SAVE</Button>
             </div>
         </div>
     )
