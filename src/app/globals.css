@@ -70,3 +70,16 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+.mtk15 {
+  color: #31cea8;
+}
+.mtk9 {
+  color: #ffffff;
+}
+.mtk12 {
+  color: #f1d977;
+}
+.mtk17 {
+  color: #c9cace;
+}

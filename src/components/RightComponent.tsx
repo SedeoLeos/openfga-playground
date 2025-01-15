@@ -4,10 +4,10 @@ import {
     CustomAccordionItem,
     CustomAccordionTrigger,
 } from "@/components/ui/custom-accordion";
+import { useAppSelector } from "@/stores/store";
+import { useMemo } from "react";
 import VisNetWorkGraph from "./VisNetWorkGraph";
 import VisTree from "./VisTree";
-import {  useMemo } from "react";
-import { useAppSelector } from "@/stores/store";
 
 
 export function RightComponent() {

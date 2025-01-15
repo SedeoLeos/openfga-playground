@@ -2,7 +2,8 @@
 import { actionSafe } from '@/lib/safe-action'
 import { StoreSchema } from '@/lib/schemas/store.schema'
 import { graphBuilder } from '@openfga/frontend-utils'
-import { CreateStoreRequest, OpenFgaApi, TupleKey } from "@openfga/sdk"
+import { CreateStoreRequest, OpenFgaApi, TupleKey, WriteAuthorizationModelRequest, WriteRequest } from "@openfga/sdk"
+import { transformer } from '@openfga/syntax-transformer'
 
 const FgaClient = new OpenFgaApi({
     apiUrl: process.env.OPENFGA_API_URL,
@@ -111,3 +112,83 @@ export const deleteStoreAction = actionSafe.schema(StoreSchema.deleteStoreSchema
         return { error: "Error deleting store" };
     }
 });
+
+
+export const createModelAction = actionSafe.schema(StoreSchema.createModelSchema).action(async ({ parsedInput: { id, body } }) => {
+    try {
+        const json = transformer.transformDSLToJSON(body) as unknown as WriteAuthorizationModelRequest;
+        const response = await FgaClient.writeAuthorizationModel(id, json);
+        if (response.$response.status !== 201) {
+            return { error: "Error creating model" };
+        }
+        if (!response.authorization_model_id) return { error: "Error creating model" };
+        return {
+            authorization_model_id: response.authorization_model_id
+        };
+    } catch (e) {
+        console.log(e)
+        return { error: "Error creating model" };
+    }
+});
+export const createTuple = actionSafe.schema(StoreSchema.createTupleSchema).action(async ({ parsedInput: { id, body } }) => {
+    try {
+        const bodyWrite: WriteRequest = {
+            writes: {
+                tuple_keys: [
+                    {
+                        user: body.user,
+                        relation: body.relation,
+                        object: body.object,
+
+                    }
+                ]
+            }
+        }
+        const tupleChangeResponse = await FgaClient.write(id, bodyWrite)
+        return {
+            data: {
+                status: tupleChangeResponse.$response.status
+            }
+        }
+
+    } catch(e) {
+        console.log("error",e)
+        return {
+            data: {
+                status: 500
+            }
+        }
+    }
+
+})
+export const deleteTuple = actionSafe.schema(StoreSchema.createTupleSchema).action(async ({ parsedInput: { id, body } }) => {
+    try {
+        const bodyWrite: WriteRequest = {
+            deletes: {
+                tuple_keys: [
+                    {
+                        user: body.user,
+                        relation: body.relation,
+                        object: body.object,
+
+                    }
+                ]
+            }
+        }
+        const tupleChangeResponse = await FgaClient.write(id, bodyWrite)
+        return {
+            data: {
+                status: tupleChangeResponse.$response.status
+            }
+        }
+
+    } catch(e) {
+        console.log("error",e)
+        return {
+            data: {
+                status: 500
+            }
+        }
+    }
+
+})

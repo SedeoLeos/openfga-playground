@@ -12,16 +12,26 @@ export default function VisNetWorkGraph() {
   const [graphId, setGraphId] = useState<string | null>(null);
   const [currentGraph, setCurrentGraph] = useState<GraphDefinition | null>(null);
 
-  useEffect(() => {
-    setGraphId(`graph-${new Date().toISOString()}`);
-  }, []);
 
   const authorizationModel = useAppSelector(
     (state) => state.authorizationModel.authorizationModel
   );
+  const currentStore = useAppSelector(
+    (state) => state.storeFga.currentStore
+  );
 
+  // First effect to clear existing graph
   useEffect(() => {
-    if (authorizationModel && graphId) {
+    if (authorizationModel || currentStore) {
+      // Clear existing graph
+      setGraphId(null);
+      setCurrentGraph(null);
+    }
+  }, [authorizationModel, currentStore]);
+
+  // Second effect to create new graph after cleanup
+  useEffect(() => {
+    if (authorizationModel && currentStore && !graphId && !currentGraph) {
       const defaultModel: AuthorizationModel = {
         id: 'test',
         schema_version: SchemaVersion.OneDotOne,
@@ -32,13 +42,17 @@ export default function VisNetWorkGraph() {
       const _authModel = authorizationModel ?? defaultModel;
       const authorizationModelGraph = new graphBuilder.AuthorizationModelGraphBuilder(
         _authModel, {
-        name: 'focus',
-        id: graphId,
-      }
+          name: currentStore?.name,
+          id: currentStore?.id,
+        }
       );
+
+      const newGraphId = `graph-${Date.now()}`;
+      setGraphId(newGraphId);
       setCurrentGraph(authorizationModelGraph.graph);
     }
-  }, [authorizationModel, graphId]);
+  }, [authorizationModel, currentStore, graphId, currentGraph]);
+
   const options = {
     nodes: {
       shape: 'dot',

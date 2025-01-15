@@ -3,11 +3,13 @@ import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 export interface ISAuthorizationModelFgaState {
     authorizationModel?: AuthorizationModel;
+    currentDsl:string;
     
 }
 
 const initialState: ISAuthorizationModelFgaState = {
     authorizationModel:undefined,
+    currentDsl:"",
 
 };
 
@@ -18,8 +20,11 @@ export const authorizationModelSlice = createSlice({
         setAuthorizationModelState: (state, action: PayloadAction<AuthorizationModel>) => {
             state.authorizationModel = action.payload;
         },
+        setCurrentDsl:(state, action: PayloadAction<string>) => {
+            state.currentDsl = action.payload;
+        }
     },
 });
 
-export const { setAuthorizationModelState } = authorizationModelSlice.actions;
+export const { setAuthorizationModelState,setCurrentDsl } = authorizationModelSlice.actions;
 export const authorizationModelReducer = authorizationModelSlice.reducer;

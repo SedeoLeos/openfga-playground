@@ -1,11 +1,11 @@
-import React, { useCallback, useEffect } from 'react'
-import MonacoEditor from './MonacoEditor'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs'
-import Tuples from './Tuples'
-import { useAppDispatch, useAppSelector } from '@/stores/store'
-import AssertionContainer from './Assertions'
 import { getAssertions, getTuples } from '@/actions/open-fga.action'
 import { setAssertionState, setTupleState } from '@/stores/slice'
+import { useAppDispatch, useAppSelector } from '@/stores/store'
+import { useCallback, useEffect } from 'react'
+import AssertionContainer from './Assertions'
+import MonacoEditor from './MonacoEditor'
+import Tuples from './Tuples'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs'
 
 
 export default function LeftComponent() {
@@ -20,6 +20,7 @@ export default function LeftComponent() {
         if (currentStore && authorizationModel) {
             const assertions = await getAssertions(currentStore.id, authorizationModel.id)
             if (assertions) dispatch(setAssertionState(assertions))
+
         }
     }, [currentStore, authorizationModel, dispatch])
     
