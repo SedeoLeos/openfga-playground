@@ -1,3 +1,4 @@
+'use client'
 import { getAssertions, getTuples } from '@/actions/open-fga.action'
 import { setAssertionState, setTupleState } from '@/stores/slice'
 import { useAppDispatch, useAppSelector } from '@/stores/store'

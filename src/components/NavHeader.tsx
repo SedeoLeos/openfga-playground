@@ -1,3 +1,4 @@
+'use client'
 import React, { useEffect } from 'react'
 import { AppLogo } from './icons/AppLogo'
 import { Combobox } from './ui/combobox'
