@@ -1,9 +1,8 @@
 "use client"
 
-import * as React from "react"
 import { Check, ChevronsUpDown } from "lucide-react"
+import * as React from "react"
 
-import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
   Command,
@@ -18,6 +17,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
+import { cn } from "@/lib/utils"
 
 
 type ComboboxProps = {
@@ -45,19 +45,19 @@ export function Combobox({ data = [], defaultValue, onSelect }: ComboboxProps) {
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-[200px] justify-between !bg-transparent"
+          className="w-[200px] justify-between !bg-gray-500/10 !border-none !shadow-none"
         >
           {value
             ? data.find((framework) => framework.value === value)?.label
-            : "Select framework..."}
+            : "Select Store..."}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[200px] p-0">
-        <Command>
-          <CommandInput placeholder="Search framework..." />
+      <PopoverContent className="w-[200px] p-0 bg-[rgb(31,33,35)] border-[rgb(58,58,58)]">
+        <Command className="bg-[rgb(31,33,35)] border-[rgb(58,58,58)] text-gray-200">
+          <CommandInput placeholder="Search Store..." className="!bg-transparent" />
           <CommandList>
-            <CommandEmpty>No framework found.</CommandEmpty>
+            <CommandEmpty>No Store found.</CommandEmpty>
             <CommandGroup>
               {data.map((framework,index) => (
                 <CommandItem
@@ -68,6 +68,7 @@ export function Combobox({ data = [], defaultValue, onSelect }: ComboboxProps) {
                     onSelect?.(currentValue)
                     setOpen(false)
                   }}
+                  className="bg-[rgb(31,33,35)] data-[selected=true]:bg-[rgb(31,33,35)] !text-white"
                 >
                   <Check
                     className={cn(

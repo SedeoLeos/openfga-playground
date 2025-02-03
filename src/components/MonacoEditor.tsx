@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
 import { createModelAction, getAuthorizationModel } from '@/actions/open-fga.action';
+import { copyToClipboard } from '@/lib/utils';
 import { setAuthorizationModelState, setCurrentDsl } from '@/stores/slice';
 import { useAppDispatch, useAppSelector } from '@/stores/store';
 import Editor, { Monaco } from '@monaco-editor/react';
@@ -66,30 +67,7 @@ function MonacoEditor() {
         updateValue()
     }, [currentStoreState, updateValue])
 
-    const copyToClipboard = async (text: string) => {
-        try {
-            // Essayer d'abord l'API Clipboard moderne
-            await navigator.clipboard.writeText(text);
-            return true;
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        } catch (err) {
-            // Fallback pour les navigateurs qui ne supportent pas l'API Clipboard
-            try {
-                const textarea = document.createElement('textarea');
-                textarea.value = text;
-                textarea.style.position = 'fixed';
-                textarea.style.opacity = '0';
-                document.body.appendChild(textarea);
-                textarea.select();
-                const result = document.execCommand('copy');
-                document.body.removeChild(textarea);
-                return result;
-            } catch (err) {
-                console.error('Impossible de copier le texte:', err);
-                return false;
-            }
-        }
-    }
+
     const typeNumber = (): string => {
         if (authorizationModelState) return `(${authorizationModelState.type_definitions.length} Types)`
         return ""
