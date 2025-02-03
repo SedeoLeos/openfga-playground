@@ -2,12 +2,17 @@
 import { actionSafe } from '@/lib/safe-action'
 import { StoreSchema } from '@/lib/schemas/store.schema'
 import { graphBuilder } from '@openfga/frontend-utils'
-import { CreateStoreRequest, OpenFgaApi, TupleKey, WriteAuthorizationModelRequest, WriteRequest } from "@openfga/sdk"
+import { CreateStoreRequest, CredentialsMethod, OpenFgaApi, TupleKey, WriteAuthorizationModelRequest, WriteRequest } from "@openfga/sdk"
 import { transformer } from '@openfga/syntax-transformer'
 
 const FgaClient = new OpenFgaApi({
     apiUrl: process.env.OPENFGA_API_URL,
-    // apiHost: process.env.OPENFGA_API_HOST
+    credentials: {
+        method: CredentialsMethod.ApiToken,
+        config: {
+            token: `${process.env.OPENFGA_KEY || ''}`,
+        }
+    }
 })
 export const getStore = async () => {
     try {
