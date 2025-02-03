@@ -1,8 +1,9 @@
 declare module 'react-graph-vis' {
-  import { Network,  Options, Node, Edge, DataSet } from 'vis-network';
   import { Component } from 'react';
+  import { DataSet, Edge, Network, Node, Options } from 'vis-network';
 
   export interface GraphEvents {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     [event: string]: (params?: any) => void;
   }
 

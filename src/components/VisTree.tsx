@@ -13,7 +13,12 @@ const treeOption = {
   nodes: {
     shape: "box",
     shapeProperties: { borderRadius: 2 },
-    margin: 10,
+    margin: {
+      top: 10,
+      bottom: 10,
+      left: 10,
+      right: 10,
+    },
     widthConstraint: { minimum: 100 },
     font: {
       strokeWidth: 0,
@@ -154,9 +159,6 @@ export default function VisTree() {
           ref={inputRef}
           className='w-full bg-transparent !outline-none placeholder:text-white/45 text-white text-sm'
           placeholder="e.g.: who is related to org:a2ed4857-e8d4-41af-8cf7-e41edb32ce78 as contract_remover?"
-          onChange={(e) => {
-
-          }}
           onKeyDown={handleKeyPress}
         />
       </div>

@@ -33,8 +33,6 @@ export const LoginAction = actionSafe.schema(LoginSchema.loginSchema).action(asy
             .setProtectedHeader({ alg: 'HS256' })
             .setExpirationTime('1h')
             .sign(secret);
-
-        console.log("token", token)
         const cookieStore = await cookies();
         cookieStore.set('token', token, { expires: new Date(Date.now() + 3600000), httpOnly: true, secure: true, sameSite: 'strict' });
         return {
@@ -42,7 +40,6 @@ export const LoginAction = actionSafe.schema(LoginSchema.loginSchema).action(asy
         };
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (e) {
-        console.log("error", e)
         return { error: "Something went wrong" };
     }
 })

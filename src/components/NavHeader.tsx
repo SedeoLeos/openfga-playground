@@ -1,6 +1,6 @@
 'use client'
 import Link from 'next/link'
-import { useEffect } from 'react'
+import { useCallback, useEffect } from 'react'
 import { AppLogo } from './icons/AppLogo'
 import { Combobox } from './ui/combobox'
 
@@ -18,15 +18,15 @@ export default function NavHeader() {
     const authorizationModelState = useAppSelector((state) => state.authorizationModel.authorizationModel);
     const currentDsl = useAppSelector((state) => state.authorizationModel.currentDsl);
     const dispatch = useAppDispatch();
-    const updateStoreList = async () => {
+    const updateStoreList = useCallback(async () => {
         const store = await getStore()
         if (store) {
             dispatch(setStoreState(store))
         }
-    }
+    }, [dispatch])
     useEffect(() => {
         updateStoreList()
-    }, [])
+    }, [updateStoreList])
     const handleSelect = (value: string) => {
         const currentStore = storeState.find((item) => item.id === value)
         if (currentStore) {
