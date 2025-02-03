@@ -67,7 +67,7 @@ export default function LoginForm() {
                                     <FormItem >
                                         <FormLabel className='min-w-[100px]'>Password *</FormLabel>
                                         <FormControl className='h-12'>
-                                            <Input  {...field} className='rounded-lg bg-[rgb(35,_35,_35)] text-[rgb(160,160,160)] border-white/30 focus:border-transparent' placeholder='********' />
+                                            <Input  {...field} className='rounded-lg bg-[rgb(35,_35,_35)] text-[rgb(160,160,160)] border-white/30 focus:border-transparent' placeholder='********' type='password' />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
