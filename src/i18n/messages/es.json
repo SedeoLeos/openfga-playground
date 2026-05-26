@@ -125,10 +125,26 @@
       "checking": "Verificando…",
       "allowed": "Permitido",
       "denied": "Denegado",
+      "delete": "Eliminar",
+      "add": "Añadir aserción",
+      "addAssertion": "Nueva aserción",
+      "runAll": "Ejecutar todas",
+      "clearResults": "Limpiar resultados",
+      "expectedResult": "Resultado esperado",
       "noAssertions": "Sin aserciones todavía.",
+      "assertionPassed": "Aserción correcta.",
+      "allPassed": "Las {count} aserciones han pasado.",
+      "someFailed": "{passed} correctas, {failed} fallidas.",
+      "assertionFailed": {
+        "expectedAllowed": "Esperado: permitido — obtenido: denegado.",
+        "expectedDenied": "Esperado: denegado — obtenido: permitido."
+      },
       "errors": {
-        "checkFailed": "Error en la verificación de la aserción.",
-        "loadFailed": "Error al cargar las aserciones."
+        "checkFailed": "Error en la verificación.",
+        "loadFailed": "Error al cargar las aserciones.",
+        "addFailed": "Error al añadir la aserción.",
+        "deleteFailed": "Error al eliminar la aserción.",
+        "noStore": "Ningún store o modelo seleccionado."
       }
     }
   },
@@ -172,8 +188,13 @@
     },
     "organization": {
       "title": "Organización",
+      "subtitle": "Gestiona los miembros de tu equipo y sus accesos.",
       "members": "Miembros",
       "invite": "Invitar miembro",
+      "sendInvite": "Enviar invitación",
+      "inviteSent": "Invitación enviada a {email}.",
+      "saasNote": "Modo multi-tenant requerido",
+      "saasNoteDesc": "La gestión completa del equipo está disponible con APP_MODE=saas. Los cambios aquí son locales a esta sesión.",
       "roles": {
         "owner": "Propietario",
         "admin": "Administrador",

@@ -125,10 +125,26 @@
       "checking": "Vérification…",
       "allowed": "Autorisé",
       "denied": "Refusé",
+      "delete": "Supprimer",
+      "add": "Ajouter une assertion",
+      "addAssertion": "Nouvelle assertion",
+      "runAll": "Tout exécuter",
+      "clearResults": "Effacer les résultats",
+      "expectedResult": "Résultat attendu",
       "noAssertions": "Aucune assertion pour l'instant.",
+      "assertionPassed": "Assertion réussie.",
+      "allPassed": "Les {count} assertions ont réussi.",
+      "someFailed": "{passed} réussies, {failed} échouées.",
+      "assertionFailed": {
+        "expectedAllowed": "Attendu : autorisé — obtenu : refusé.",
+        "expectedDenied": "Attendu : refusé — obtenu : autorisé."
+      },
       "errors": {
-        "checkFailed": "Échec de la vérification de l'assertion.",
-        "loadFailed": "Échec du chargement des assertions."
+        "checkFailed": "Échec de la vérification.",
+        "loadFailed": "Échec du chargement des assertions.",
+        "addFailed": "Échec de l'ajout de l'assertion.",
+        "deleteFailed": "Échec de la suppression de l'assertion.",
+        "noStore": "Aucun store ou modèle sélectionné."
       }
     }
   },
@@ -172,8 +188,13 @@
     },
     "organization": {
       "title": "Organisation",
+      "subtitle": "Gérez les membres de votre équipe et leurs accès.",
       "members": "Membres",
       "invite": "Inviter un membre",
+      "sendInvite": "Envoyer l'invitation",
+      "inviteSent": "Invitation envoyée à {email}.",
+      "saasNote": "Mode multi-tenant requis",
+      "saasNoteDesc": "La gestion complète de l'équipe est disponible en APP_MODE=saas. Les modifications ici sont locales à cette session.",
       "roles": {
         "owner": "Propriétaire",
         "admin": "Administrateur",

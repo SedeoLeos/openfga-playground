@@ -1,29 +1,107 @@
 'use client'
 
 import { useTranslations } from 'next-intl'
-import { Trash2, Play, HelpCircle } from 'lucide-react'
+import { useTransition } from 'react'
+import { Trash2, Play, HelpCircle, CheckCircle2, XCircle, Loader2 } from 'lucide-react'
 import type { Assertion } from '@openfga/sdk'
 import { Button } from '@/components/ui/button'
-import { useAppDispatch } from '@/stores/store'
-import { setCurrentAssertionState } from '@/stores/slice'
+import { useAppDispatch, useAppSelector } from '@/stores/store'
+import {
+  assertionKey,
+  removeAssertionState,
+  setAssertionResult,
+  setCurrentAssertionState,
+  type AssertionResult,
+} from '@/stores/slice'
+import { checkTuple, writeAssertions } from '@/actions/open-fga.action'
 import { cn } from '@/lib/utils'
+import { toast } from 'sonner'
 
-const DEFAULT_ASSERTION: Assertion = {
-  tuple_key: {
-    user: 'user:alice',
-    relation: 'viewer',
-    object: 'document:readme',
-  },
-  expectation: true,
+function ResultIcon({ result }: { result: AssertionResult | undefined }) {
+  if (!result) return <HelpCircle className="size-4 shrink-0 text-muted" />
+  if (result === 'pending') return <Loader2 className="size-4 shrink-0 animate-spin text-muted" />
+  if (result === 'pass') return <CheckCircle2 className="size-4 shrink-0 text-success" />
+  if (result === 'fail') return <XCircle className="size-4 shrink-0 text-destructive" />
+  return <XCircle className="size-4 shrink-0 text-warning" />
 }
 
-export default function AssertionItem({ assertion = DEFAULT_ASSERTION }: { assertion?: Assertion }) {
+interface Props {
+  assertion: Assertion
+}
+
+export default function AssertionItem({ assertion }: Props) {
   const t = useTranslations('playground.assertions')
   const dispatch = useAppDispatch()
+  const [isPending, startTransition] = useTransition()
+
+  const currentStore = useAppSelector((s) => s.storeFga.currentStore)
+  const authorizationModel = useAppSelector((s) => s.authorizationModel.authorizationModel)
+  const result = useAppSelector((s) => s.assertionFga.results[assertionKey(assertion)])
+  const allAssertions = useAppSelector((s) => s.assertionFga.assertions)
+
+  function handleCheck() {
+    if (!currentStore?.id || !authorizationModel?.id) {
+      toast.error(t('errors.noStore'))
+      return
+    }
+    dispatch(setCurrentAssertionState(assertion))
+    startTransition(async () => {
+      dispatch(setAssertionResult({ assertion, result: 'pending' }))
+      const { allowed, error } = await checkTuple(
+        currentStore.id!,
+        authorizationModel.id!,
+        assertion.tuple_key
+      )
+      if (error) {
+        dispatch(setAssertionResult({ assertion, result: 'error' }))
+        toast.error(t('errors.checkFailed'))
+        return
+      }
+      const pass = allowed === assertion.expectation
+      dispatch(setAssertionResult({ assertion, result: pass ? 'pass' : 'fail' }))
+      if (pass) {
+        toast.success(t('assertionPassed'))
+      } else {
+        toast.error(
+          assertion.expectation
+            ? t('assertionFailed.expectedAllowed')
+            : t('assertionFailed.expectedDenied')
+        )
+      }
+    })
+  }
+
+  function handleDelete() {
+    if (!currentStore?.id || !authorizationModel?.id) return
+    startTransition(async () => {
+      const remaining = allAssertions.filter(
+        (a) => assertionKey(a) !== assertionKey(assertion)
+      )
+      const { error } = await writeAssertions(
+        currentStore.id!,
+        authorizationModel.id!,
+        remaining
+      )
+      if (error) {
+        toast.error(t('errors.deleteFailed'))
+        return
+      }
+      dispatch(removeAssertionState(assertion))
+      toast.success(t('deleted'))
+    })
+  }
 
   return (
-    <div className="flex items-center justify-between gap-3 rounded-md border border-border/60 bg-surface p-3 text-sm">
-      <HelpCircle className="size-4 shrink-0 text-muted" />
+    <div
+      className={cn(
+        'flex items-center justify-between gap-3 rounded-md border bg-surface p-3 text-sm transition-colors',
+        result === 'pass' && 'border-success/40',
+        result === 'fail' && 'border-destructive/40',
+        result === 'error' && 'border-warning/40',
+        !result && 'border-border/60'
+      )}
+    >
+      <ResultIcon result={result} />
       <div className="grid min-w-0 flex-1 grid-cols-[60px_1fr] gap-x-3 gap-y-1 text-xs">
         <span className="text-muted">User</span>
         <span className="truncate font-mono">{assertion.tuple_key.user}</span>
@@ -41,13 +119,29 @@ export default function AssertionItem({ assertion = DEFAULT_ASSERTION }: { asser
           variant="ghost"
           size="icon"
           className="size-7 text-muted hover:text-foreground"
-          onClick={() => dispatch(setCurrentAssertionState(assertion))}
+          onClick={handleCheck}
+          disabled={isPending}
           title={t('check')}
         >
-          <Play className="size-3.5" />
+          {result === 'pending' ? (
+            <Loader2 className="size-3.5 animate-spin" />
+          ) : (
+            <Play className="size-3.5" />
+          )}
         </Button>
-        <Button variant="ghost" size="icon" className="size-7 text-muted hover:text-destructive" title="Remove">
-          <Trash2 className="size-3.5" />
+        <Button
+          variant="ghost"
+          size="icon"
+          className="size-7 text-muted hover:text-destructive"
+          onClick={handleDelete}
+          disabled={isPending}
+          title={t('delete')}
+        >
+          {isPending && result !== 'pending' ? (
+            <Loader2 className="size-3.5 animate-spin" />
+          ) : (
+            <Trash2 className="size-3.5" />
+          )}
         </Button>
       </div>
     </div>

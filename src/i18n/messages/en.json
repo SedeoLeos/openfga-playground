@@ -125,10 +125,26 @@
       "checking": "Checking…",
       "allowed": "Allowed",
       "denied": "Denied",
+      "delete": "Delete",
+      "add": "Add assertion",
+      "addAssertion": "New assertion",
+      "runAll": "Run all",
+      "clearResults": "Clear results",
+      "expectedResult": "Expected result",
       "noAssertions": "No assertions yet.",
+      "assertionPassed": "Assertion passed.",
+      "allPassed": "All {count} assertions passed.",
+      "someFailed": "{passed} passed, {failed} failed.",
+      "assertionFailed": {
+        "expectedAllowed": "Expected allowed — got denied.",
+        "expectedDenied": "Expected denied — got allowed."
+      },
       "errors": {
         "checkFailed": "Assertion check failed.",
-        "loadFailed": "Failed to load assertions."
+        "loadFailed": "Failed to load assertions.",
+        "addFailed": "Failed to add assertion.",
+        "deleteFailed": "Failed to delete assertion.",
+        "noStore": "No store or model selected."
       }
     }
   },
@@ -172,8 +188,13 @@
     },
     "organization": {
       "title": "Organization",
+      "subtitle": "Manage your team members and access.",
       "members": "Members",
       "invite": "Invite member",
+      "sendInvite": "Send invite",
+      "inviteSent": "Invitation sent to {email}.",
+      "saasNote": "Multi-tenant mode required",
+      "saasNoteDesc": "Full team management is available when APP_MODE=saas. Member changes here are local to this session only.",
       "roles": {
         "owner": "Owner",
         "admin": "Admin",

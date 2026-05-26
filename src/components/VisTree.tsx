@@ -33,6 +33,20 @@ function formatAssertionQuery(a: Assertion) {
   return `Is ${a.tuple_key.user} related to ${a.tuple_key.object} as ${a.tuple_key.relation}?`
 }
 
+/**
+ * Parse "Is user:alice related to document:readme as viewer?"
+ * Returns { user, object, relation } or null if the format doesn't match.
+ */
+function parseAssertionQuery(
+  query: string
+): { user: string; object: string; relation: string } | null {
+  const match = query
+    .trim()
+    .match(/^Is\s+(.+?)\s+related to\s+(.+?)\s+as\s+(.+?)\??$/i)
+  if (!match) return null
+  return { user: match[1].trim(), object: match[2].trim(), relation: match[3].trim() }
+}
+
 export default function VisTree() {
   const t = useTranslations('playground.assertions')
   const currentStore = useAppSelector((s) => s.storeFga.currentStore)
@@ -40,36 +54,50 @@ export default function VisTree() {
   const inputRef = useRef<HTMLInputElement>(null)
   const [graphId, setGraphId] = useState(`graph-${Date.now()}`)
   const [graph, setGraph] = useState<GraphDefinition | null>(null)
+  const [queryParams, setQueryParams] = useState<{ user: string; object: string } | null>(null)
 
+  // currentAssertion changed → update input + trigger graph
   useEffect(() => {
-    if (!currentAssertion?.tuple_key || !currentStore?.id) return
-    generateGraph(
-      currentAssertion.tuple_key.object,
-      currentAssertion.tuple_key.user,
-      currentStore.id
-    ).then(({ graph: g }) => {
+    if (!currentAssertion?.tuple_key) return
+    if (inputRef.current) {
+      inputRef.current.value = formatAssertionQuery(currentAssertion)
+    }
+    setQueryParams({
+      user: currentAssertion.tuple_key.user,
+      object: currentAssertion.tuple_key.object,
+    })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentAssertion?.tuple_key?.user, currentAssertion?.tuple_key?.relation, currentAssertion?.tuple_key?.object])
+
+  // queryParams changed → fetch graph from server
+  useEffect(() => {
+    if (!queryParams || !currentStore?.id) return
+    generateGraph(queryParams.object, queryParams.user, currentStore.id).then(({ graph: g }) => {
       if (!g) return
       setGraph({
         ...g,
         nodes: g.nodes.map((n) => ({
           ...n,
           color:
-            n.id === currentAssertion.tuple_key.object || n.id === currentAssertion.tuple_key.user
-              ? { background: '#6366f1', border: '#6366f1', highlight: { background: '#818cf8', border: '#818cf8' } }
+            n.id === queryParams.object || n.id === queryParams.user
+              ? {
+                  background: '#6366f1',
+                  border: '#6366f1',
+                  highlight: { background: '#818cf8', border: '#818cf8' },
+                }
               : undefined,
         })),
       })
+      setGraphId(`graph-${Date.now()}`)
     })
-  }, [currentAssertion?.tuple_key, currentStore?.id])
-
-  useEffect(() => {
-    if (currentAssertion && inputRef.current) {
-      inputRef.current.value = formatAssertionQuery(currentAssertion)
-    }
-  }, [currentAssertion])
+  }, [queryParams, currentStore?.id])
 
   function handleKeyDown(e: KeyboardEvent<HTMLInputElement>) {
-    if (e.key === 'Enter') setGraphId(`graph-${Date.now()}`)
+    if (e.key !== 'Enter') return
+    const raw = inputRef.current?.value ?? ''
+    const parsed = parseAssertionQuery(raw)
+    if (!parsed) return
+    setQueryParams({ user: parsed.user, object: parsed.object })
   }
 
   return (
@@ -84,7 +112,11 @@ export default function VisTree() {
               ...treeOption,
               nodes: {
                 ...treeOption.nodes,
-                color: { background: '#1a1b1e', border: '#2d2e33', highlight: { background: '#2d2e33', border: '#6366f1' } },
+                color: {
+                  background: '#1a1b1e',
+                  border: '#2d2e33',
+                  highlight: { background: '#2d2e33', border: '#6366f1' },
+                },
               },
             }}
           />
@@ -99,7 +131,7 @@ export default function VisTree() {
         <input
           ref={inputRef}
           className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted/50"
-          placeholder="e.g.: Is user:alice related to document:readme as viewer?"
+          placeholder="Is user:alice related to document:readme as viewer?"
           onKeyDown={handleKeyDown}
         />
       </div>

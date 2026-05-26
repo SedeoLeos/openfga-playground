@@ -5,8 +5,11 @@ import { StoreSchema } from '@/lib/schemas/store.schema'
 import { defaultFgaClient, createFgaClient } from '@/lib/fga-client'
 import { graphBuilder } from '@openfga/frontend-utils'
 import {
+  Assertion,
+  CheckRequest,
   CreateStoreRequest,
   TupleKey,
+  WriteAssertionsRequest,
   WriteAuthorizationModelRequest,
   WriteRequest,
 } from '@openfga/sdk'
@@ -165,6 +168,43 @@ export const createTupleAction = actionSafe
       return { error: 'Failed to add tuple' }
     }
   })
+
+export async function checkTuple(
+  storeId: string,
+  authorizationModelId: string,
+  tupleKey: TupleKey,
+  datasource?: { apiUrl: string; apiToken: string | null } | null
+) {
+  try {
+    const client = fgaClient(datasource)
+    const body: CheckRequest = {
+      tuple_key: tupleKey,
+      authorization_model_id: authorizationModelId,
+    }
+    const response = await client.check(storeId, body)
+    return { allowed: response.allowed ?? false, error: null }
+  } catch (e) {
+    console.error('[checkTuple]', e)
+    return { allowed: false, error: 'Check failed' }
+  }
+}
+
+export async function writeAssertions(
+  storeId: string,
+  authorizationModelId: string,
+  assertions: Assertion[],
+  datasource?: { apiUrl: string; apiToken: string | null } | null
+) {
+  try {
+    const client = fgaClient(datasource)
+    const body: WriteAssertionsRequest = { assertions }
+    await client.writeAssertions(storeId, authorizationModelId, body)
+    return { error: null }
+  } catch (e) {
+    console.error('[writeAssertions]', e)
+    return { error: 'Failed to write assertions' }
+  }
+}
 
 export const deleteTupleAction = actionSafe
   .schema(StoreSchema.createTupleSchema)
