@@ -156,6 +156,7 @@
     "profile": {
       "title": "Perfil",
       "displayName": "Nombre para mostrar",
+      "displayNamePlaceholder": "Tu nombre",
       "email": "Correo electrónico",
       "avatar": "Avatar",
       "changePassword": "Cambiar contraseña",

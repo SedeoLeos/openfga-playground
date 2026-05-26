@@ -18,6 +18,7 @@ import { Input } from '@/components/ui/input'
 
 export default function StoreForm() {
   const t = useTranslations('playground.store')
+  const tp = useTranslations('playground')
   const tc = useTranslations('common')
   const [open, setOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
@@ -49,12 +50,12 @@ export default function StoreForm() {
       <DialogTrigger asChild>
         <Button size="sm" className="gap-1.5">
           <Plus className="size-3.5" />
-          <span className="hidden sm:inline">{t('nameLabel').split(' ')[0]}</span>
+          <span className="hidden sm:inline">{tp('createStore')}</span>
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-sm">
         <DialogHeader>
-          <DialogTitle>{tc('add')} store</DialogTitle>
+          <DialogTitle>{tp('createStore')}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">

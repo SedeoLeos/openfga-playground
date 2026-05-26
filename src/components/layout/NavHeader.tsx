@@ -122,7 +122,10 @@ export default function NavHeader() {
             >
               {t('copyModelId')}
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => handleCopy(currentDsl, t('copyStoreData'))}>
+            <DropdownMenuItem
+              onClick={() => handleCopy(currentDsl, t('copyStoreData'))}
+              disabled={!currentDsl}
+            >
               {t('copyStoreData')}
             </DropdownMenuItem>
           </DropdownMenuContent>

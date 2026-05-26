@@ -76,7 +76,7 @@ export default function ProfileSettings() {
                 <FormControl>
                   <Input
                     {...field}
-                    placeholder="Your name"
+                    placeholder={t('displayNamePlaceholder')}
                     autoComplete="name"
                     disabled={isSaving}
                   />
