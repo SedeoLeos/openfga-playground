@@ -18,6 +18,7 @@ export type TupleFormProps = { cancel: () => void }
 
 export default function TupleForm({ cancel }: TupleFormProps) {
   const t = useTranslations('playground.tuples')
+  const tc = useTranslations('common')
   const currentStore = useAppSelector((state) => state.storeFga.currentStore)
   const dispatch = useAppDispatch()
   const [isPending, startTransition] = useTransition()
@@ -80,7 +81,7 @@ export default function TupleForm({ cancel }: TupleFormProps) {
           ))}
           <div className="flex justify-end gap-2 pt-1">
             <Button type="button" variant="ghost" size="sm" onClick={cancel} disabled={isPending}>
-              Cancel
+              {tc('cancel')}
             </Button>
             <Button type="submit" size="sm" disabled={isPending}>
               {isPending ? (

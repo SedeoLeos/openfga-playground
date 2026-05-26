@@ -43,6 +43,7 @@ type FormValues = z.infer<typeof schema>
 export default function AssertToolList() {
   const t = useTranslations('playground.assertions')
   const tc = useTranslations('common')
+  const tt = useTranslations('playground.tuples')
   const dispatch = useAppDispatch()
   const [isPending, startTransition] = useTransition()
   const [dialogOpen, setDialogOpen] = useState(false)
@@ -175,9 +176,9 @@ export default function AssertToolList() {
                 name="user"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>User</FormLabel>
+                    <FormLabel>{tt('user')}</FormLabel>
                     <FormControl>
-                      <Input placeholder="user:alice" {...field} />
+                      <Input placeholder={tt('userPlaceholder')} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -188,9 +189,9 @@ export default function AssertToolList() {
                 name="relation"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Relation</FormLabel>
+                    <FormLabel>{tt('relation')}</FormLabel>
                     <FormControl>
-                      <Input placeholder="viewer" {...field} />
+                      <Input placeholder={tt('relationPlaceholder')} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -201,9 +202,9 @@ export default function AssertToolList() {
                 name="object"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Object</FormLabel>
+                    <FormLabel>{tt('object')}</FormLabel>
                     <FormControl>
-                      <Input placeholder="document:readme" {...field} />
+                      <Input placeholder={tt('objectPlaceholder')} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

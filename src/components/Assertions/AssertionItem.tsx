@@ -2,7 +2,7 @@
 
 import { useTranslations } from 'next-intl'
 import { useTransition } from 'react'
-import { Trash2, Play, HelpCircle, CheckCircle2, XCircle, Loader2 } from 'lucide-react'
+import { Trash2, Play, HelpCircle, CheckCircle2, XCircle, Loader2, ChevronRight } from 'lucide-react'
 import type { Assertion } from '@openfga/sdk'
 import { Button } from '@/components/ui/button'
 import { useAppDispatch, useAppSelector } from '@/stores/store'
@@ -18,11 +18,11 @@ import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 
 function ResultIcon({ result }: { result: AssertionResult | undefined }) {
-  if (!result) return <HelpCircle className="size-4 shrink-0 text-muted" />
-  if (result === 'pending') return <Loader2 className="size-4 shrink-0 animate-spin text-muted" />
-  if (result === 'pass') return <CheckCircle2 className="size-4 shrink-0 text-success" />
-  if (result === 'fail') return <XCircle className="size-4 shrink-0 text-destructive" />
-  return <XCircle className="size-4 shrink-0 text-warning" />
+  if (!result) return <HelpCircle className="size-3.5 shrink-0 text-muted/60" />
+  if (result === 'pending') return <Loader2 className="size-3.5 shrink-0 animate-spin text-muted" />
+  if (result === 'pass') return <CheckCircle2 className="size-3.5 shrink-0 text-success" />
+  if (result === 'fail') return <XCircle className="size-3.5 shrink-0 text-destructive" />
+  return <XCircle className="size-3.5 shrink-0 text-warning" />
 }
 
 interface Props {
@@ -94,55 +94,78 @@ export default function AssertionItem({ assertion }: Props) {
   return (
     <div
       className={cn(
-        'flex items-center justify-between gap-3 rounded-md border bg-surface p-3 text-sm transition-colors',
-        result === 'pass' && 'border-success/40',
-        result === 'fail' && 'border-destructive/40',
-        result === 'error' && 'border-warning/40',
-        !result && 'border-border/60'
+        'flex flex-col gap-2 rounded-md border bg-surface px-3 py-2.5 text-xs transition-colors',
+        result === 'pass' && 'border-success/40 bg-success/5',
+        result === 'fail' && 'border-destructive/40 bg-destructive/5',
+        result === 'error' && 'border-warning/40 bg-warning/5',
+        !result && 'border-border/60 hover:border-border',
       )}
     >
-      <ResultIcon result={result} />
-      <div className="grid min-w-0 flex-1 grid-cols-[60px_1fr] gap-x-3 gap-y-1 text-xs">
-        <span className="text-muted">User</span>
-        <span className="truncate font-mono">{assertion.tuple_key.user}</span>
-        <span className="text-muted">Relation</span>
-        <span className="truncate font-mono">{assertion.tuple_key.relation}</span>
-        <span className="text-muted">Object</span>
-        <span className="truncate font-mono">{assertion.tuple_key.object}</span>
-        <span className="text-muted">Expected</span>
-        <span className={cn('font-medium', assertion.expectation ? 'text-success' : 'text-destructive')}>
+      {/* Row 1: status icon + tuple flow + action buttons */}
+      <div className="flex items-center gap-2">
+        <ResultIcon result={result} />
+
+        {/* Tuple flow: user → relation → object */}
+        <div className="flex min-w-0 flex-1 items-center gap-1 font-mono">
+          <span className="truncate text-muted" title={assertion.tuple_key.user}>
+            {assertion.tuple_key.user}
+          </span>
+          <ChevronRight className="size-3 shrink-0 text-muted/40" />
+          <span className="shrink-0 rounded bg-primary/10 px-1.5 py-0.5 font-medium text-primary">
+            {assertion.tuple_key.relation}
+          </span>
+          <ChevronRight className="size-3 shrink-0 text-muted/40" />
+          <span className="truncate text-foreground/80" title={assertion.tuple_key.object}>
+            {assertion.tuple_key.object}
+          </span>
+        </div>
+
+        {/* Actions */}
+        <div className="flex shrink-0 gap-0.5">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="size-6 text-muted hover:text-foreground"
+            onClick={handleCheck}
+            disabled={isPending}
+            title={t('check')}
+          >
+            {result === 'pending' ? (
+              <Loader2 className="size-3 animate-spin" />
+            ) : (
+              <Play className="size-3" />
+            )}
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="size-6 text-muted hover:text-destructive"
+            onClick={handleDelete}
+            disabled={isPending}
+            title={t('delete')}
+          >
+            {isPending && result !== 'pending' ? (
+              <Loader2 className="size-3 animate-spin" />
+            ) : (
+              <Trash2 className="size-3" />
+            )}
+          </Button>
+        </div>
+      </div>
+
+      {/* Row 2: expected result badge */}
+      <div className="flex items-center gap-2 pl-5">
+        <span className="text-muted/70">Expected:</span>
+        <span
+          className={cn(
+            'rounded px-1.5 py-0.5 font-medium',
+            assertion.expectation
+              ? 'bg-success/10 text-success'
+              : 'bg-destructive/10 text-destructive',
+          )}
+        >
           {assertion.expectation ? t('allowed') : t('denied')}
         </span>
-      </div>
-      <div className="flex shrink-0 gap-1">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="size-7 text-muted hover:text-foreground"
-          onClick={handleCheck}
-          disabled={isPending}
-          title={t('check')}
-        >
-          {result === 'pending' ? (
-            <Loader2 className="size-3.5 animate-spin" />
-          ) : (
-            <Play className="size-3.5" />
-          )}
-        </Button>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="size-7 text-muted hover:text-destructive"
-          onClick={handleDelete}
-          disabled={isPending}
-          title={t('delete')}
-        >
-          {isPending && result !== 'pending' ? (
-            <Loader2 className="size-3.5 animate-spin" />
-          ) : (
-            <Trash2 className="size-3.5" />
-          )}
-        </Button>
       </div>
     </div>
   )
