@@ -1,199 +1,182 @@
 'use server'
+
 import { actionSafe } from '@/lib/safe-action'
 import { StoreSchema } from '@/lib/schemas/store.schema'
+import { defaultFgaClient, createFgaClient } from '@/lib/fga-client'
 import { graphBuilder } from '@openfga/frontend-utils'
-import { CreateStoreRequest, CredentialsMethod, OpenFgaApi, TupleKey, WriteAuthorizationModelRequest, WriteRequest } from "@openfga/sdk"
-import { transformer } from '@openfga/syntax-transformer'
+import {
+  CreateStoreRequest,
+  TupleKey,
+  WriteAuthorizationModelRequest,
+  WriteRequest,
+} from '@openfga/sdk'
+import { transformer as syntaxTransformer } from '@openfga/syntax-transformer'
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const tr = syntaxTransformer as any
+const dslToJson = tr.transformDSLToJSON ?? tr.friendlySyntaxToApiSyntax
 
-const FgaClient = new OpenFgaApi({
-    apiUrl: process.env.OPENFGA_API_URL,
-    credentials: {
-        method: CredentialsMethod.ApiToken,
-        config: {
-            token: `${process.env.OPENFGA_KEY || ''}`,
-        }
-    }
-})
-export const getStore = async () => {
-    try {
-        const response = await FgaClient.listStores()
-        if (response.$response.status != 200) return []
-        return response.stores;
-    } catch {
-        return []
-    }
+function fgaClient(datasource?: { apiUrl: string; apiToken: string | null } | null) {
+  return datasource ? createFgaClient(datasource) : defaultFgaClient
 }
 
-export const getTuples = async (storeId: string) => {
-    try {
-        const body = {}
-        const tupleChangeResponse = await FgaClient.read(storeId, body)
-        if (tupleChangeResponse.$response.status != 200) return []
-        return tupleChangeResponse.tuples
-
-    } catch {
-        return []
-    }
-
+export async function getStore(datasource?: { apiUrl: string; apiToken: string | null } | null) {
+  try {
+    const client = fgaClient(datasource)
+    const response = await client.listStores()
+    if (response.$response.status !== 200) return { stores: [], error: null }
+    return { stores: response.stores ?? [], error: null }
+  } catch (e) {
+    console.error('[getStore]', e)
+    return { stores: [], error: 'Failed to load stores' }
+  }
 }
 
-export const getAssertions = async (storeId: string, authorizationModelId: string) => {
-    try {
-        const tupleChangeResponse = await FgaClient.readAssertions(storeId, authorizationModelId)
-        if (tupleChangeResponse.$response.status != 200) return []
-        return tupleChangeResponse.assertions
-
-    } catch {
-        return []
-    }
-
-}
-export const getAuthorizationModel = async (storeId: string) => {
-    try {
-        const response = await FgaClient.readAuthorizationModels(storeId)
-        if (response.$response.status != 200) return;
-        return response.authorization_models[0];
-    } catch {
-        return;
-    }
+export async function getTuples(
+  storeId: string,
+  datasource?: { apiUrl: string; apiToken: string | null } | null
+) {
+  try {
+    const client = fgaClient(datasource)
+    const response = await client.read(storeId, {})
+    if (response.$response.status !== 200) return { tuples: [], error: null }
+    return { tuples: response.tuples ?? [], error: null }
+  } catch (e) {
+    console.error('[getTuples]', e)
+    return { tuples: [], error: 'Failed to load tuples' }
+  }
 }
 
-export const generateGraph = async (object = "org:a2ed4857-e8d4-41af-8cf7-e41edb32ce78", user = "user:e41acffd-6d30-4467-bca6-883d678b5934") => {
-    try {
+export async function getAssertions(
+  storeId: string,
+  authorizationModelId: string,
+  datasource?: { apiUrl: string; apiToken: string | null } | null
+) {
+  try {
+    const client = fgaClient(datasource)
+    const response = await client.readAssertions(storeId, authorizationModelId)
+    if (response.$response.status !== 200) return { assertions: [], error: null }
+    return { assertions: response.assertions ?? [], error: null }
+  } catch (e) {
+    console.error('[getAssertions]', e)
+    return { assertions: [], error: 'Failed to load assertions' }
+  }
+}
 
-        const capturedTuple: Required<Omit<TupleKey, "user">> = {
-            relation: "owner",
-            object,
-            condition: {
-                name: '',
-                context: []
-            }
-        };
-        const treeBuilder = new graphBuilder.TreeBuilder(FgaClient, capturedTuple, "01JFSEX3J8S7M9JNM87C7ATVF8");
-        await treeBuilder.buildTree();
-        const graphBuild = treeBuilder.buildGraph(user);
-        return graphBuild
-    } catch (error) {
-        console.log(error);
-        return null
+export async function getAuthorizationModel(
+  storeId: string,
+  datasource?: { apiUrl: string; apiToken: string | null } | null
+) {
+  try {
+    const client = fgaClient(datasource)
+    const response = await client.readAuthorizationModels(storeId)
+    if (response.$response.status !== 200) return { model: null, error: null }
+    return { model: response.authorization_models?.[0] ?? null, error: null }
+  } catch (e) {
+    console.error('[getAuthorizationModel]', e)
+    return { model: null, error: 'Failed to load authorization model' }
+  }
+}
+
+export async function generateGraph(
+  object: string,
+  user: string,
+  storeId: string,
+  datasource?: { apiUrl: string; apiToken: string | null } | null
+) {
+  try {
+    const client = fgaClient(datasource)
+    const capturedTuple: Required<Omit<TupleKey, 'user'>> = {
+      relation: 'owner',
+      object,
+      condition: { name: '', context: [] },
     }
-};
-export const createStoreAction = actionSafe.schema(StoreSchema.createStoreSchema).action(async ({ parsedInput: { name } }) => {
+    const treeBuilder = new graphBuilder.TreeBuilder(client, capturedTuple, storeId)
+    await treeBuilder.buildTree()
+    return { graph: treeBuilder.buildGraph(user), error: null }
+  } catch (e) {
+    console.error('[generateGraph]', e)
+    return { graph: null, error: 'Failed to generate graph' }
+  }
+}
+
+export const createStoreAction = actionSafe
+  .schema(StoreSchema.createStoreSchema)
+  .action(async ({ parsedInput: { name } }) => {
     try {
-        const body: CreateStoreRequest = { name: name };
-        const response = await FgaClient.createStore(body);
-
-        if (response.$response.status !== 201) {
-            return { error: "Error creating store" };
-        }
-
-        return {
-            store: {
-                id: response.id,
-                name: response.name,
-                created_at: response.created_at,
-                updated_at: response.updated_at,
-            },
-        };
+      const body: CreateStoreRequest = { name }
+      const response = await defaultFgaClient.createStore(body)
+      if (response.$response.status !== 201) return { error: 'Failed to create store' }
+      return {
+        store: {
+          id: response.id,
+          name: response.name,
+          created_at: response.created_at,
+          updated_at: response.updated_at,
+        },
+      }
     } catch (e) {
-        console.log(e)
-        return { error: "Error creating store" };
+      console.error('[createStore]', e)
+      return { error: 'Failed to create store' }
     }
-});
+  })
 
-export const deleteStoreAction = actionSafe.schema(StoreSchema.deleteStoreSchema).action(async ({ parsedInput: { id } }) => {
+export const deleteStoreAction = actionSafe
+  .schema(StoreSchema.deleteStoreSchema)
+  .action(async ({ parsedInput: { id } }) => {
     try {
-        const response = await FgaClient.deleteStore(id);
-        if (response.$response.status !== 204) {
-            return { error: "Error deleting store" };
-        }
-        return {
-            store: {
-                id: id,
-            },
-        };
+      const response = await defaultFgaClient.deleteStore(id)
+      if (response.$response.status !== 204) return { error: 'Failed to delete store' }
+      return { store: { id } }
     } catch (e) {
-        console.log(e)
-        return { error: "Error deleting store" };
+      console.error('[deleteStore]', e)
+      return { error: 'Failed to delete store' }
     }
-});
+  })
 
-
-export const createModelAction = actionSafe.schema(StoreSchema.createModelSchema).action(async ({ parsedInput: { id, body } }) => {
+export const createModelAction = actionSafe
+  .schema(StoreSchema.createModelSchema)
+  .action(async ({ parsedInput: { id, body } }) => {
     try {
-        const json = transformer.transformDSLToJSON(body) as unknown as WriteAuthorizationModelRequest;
-        const response = await FgaClient.writeAuthorizationModel(id, json);
-        if (response.$response.status !== 201) {
-            return { error: "Error creating model" };
-        }
-        if (!response.authorization_model_id) return { error: "Error creating model" };
-        return {
-            authorization_model_id: response.authorization_model_id
-        };
+      const json = dslToJson(
+        body
+      ) as unknown as WriteAuthorizationModelRequest
+      const response = await defaultFgaClient.writeAuthorizationModel(id, json)
+      if (response.$response.status !== 201) return { error: 'Failed to save model' }
+      if (!response.authorization_model_id) return { error: 'Failed to save model' }
+      return { authorization_model_id: response.authorization_model_id }
     } catch (e) {
-        console.log(e)
-        return { error: "Error creating model" };
+      console.error('[createModel]', e)
+      const msg = e instanceof Error ? e.message : 'Failed to save model'
+      return { error: msg }
     }
-});
-export const createTuple = actionSafe.schema(StoreSchema.createTupleSchema).action(async ({ parsedInput: { id, body } }) => {
+  })
+
+export const createTupleAction = actionSafe
+  .schema(StoreSchema.createTupleSchema)
+  .action(async ({ parsedInput: { id, body } }) => {
     try {
-        const bodyWrite: WriteRequest = {
-            writes: {
-                tuple_keys: [
-                    {
-                        user: body.user,
-                        relation: body.relation,
-                        object: body.object,
-
-                    }
-                ]
-            }
-        }
-        const tupleChangeResponse = await FgaClient.write(id, bodyWrite)
-        return {
-            data: {
-                status: tupleChangeResponse.$response.status
-            }
-        }
-
-    } catch(e) {
-        console.log("error",e)
-        return {
-            data: {
-                status: 500
-            }
-        }
+      const bodyWrite: WriteRequest = {
+        writes: { tuple_keys: [{ user: body.user, relation: body.relation, object: body.object }] },
+      }
+      const response = await defaultFgaClient.write(id, bodyWrite)
+      return { status: response.$response.status }
+    } catch (e) {
+      console.error('[createTuple]', e)
+      return { error: 'Failed to add tuple' }
     }
+  })
 
-})
-export const deleteTuple = actionSafe.schema(StoreSchema.createTupleSchema).action(async ({ parsedInput: { id, body } }) => {
+export const deleteTupleAction = actionSafe
+  .schema(StoreSchema.createTupleSchema)
+  .action(async ({ parsedInput: { id, body } }) => {
     try {
-        const bodyWrite: WriteRequest = {
-            deletes: {
-                tuple_keys: [
-                    {
-                        user: body.user,
-                        relation: body.relation,
-                        object: body.object,
-
-                    }
-                ]
-            }
-        }
-        const tupleChangeResponse = await FgaClient.write(id, bodyWrite)
-        return {
-            data: {
-                status: tupleChangeResponse.$response.status
-            }
-        }
-
-    } catch(e) {
-        console.log("error",e)
-        return {
-            data: {
-                status: 500
-            }
-        }
+      const bodyWrite: WriteRequest = {
+        deletes: { tuple_keys: [{ user: body.user, relation: body.relation, object: body.object }] },
+      }
+      const response = await defaultFgaClient.write(id, bodyWrite)
+      return { status: response.$response.status }
+    } catch (e) {
+      console.error('[deleteTuple]', e)
+      return { error: 'Failed to remove tuple' }
     }
-
-})
+  })

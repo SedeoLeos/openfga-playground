@@ -1,61 +1,70 @@
-import { deleteTuple } from '@/actions/open-fga.action';
-import { removeTuple } from '@/stores/slice';
-import { useAppDispatch, useAppSelector } from '@/stores/store';
-import { Tuple } from '@openfga/sdk';
-import DeleteIcon from '../icons/Delete';
-import InfoIcon from '../icons/Info';
-import { Button } from '../ui/button';
-const DEFAULT_TUPLE = {
-    user: "user:e41acffd-6d30-4467-bca6-883d678b5934",
-    relation: "owner",
-    object: "org:org1"
-}
-export default function TupleItem({ user = DEFAULT_TUPLE.user, relation = DEFAULT_TUPLE.relation, object = DEFAULT_TUPLE.object }: {
-    user?: string;
-    relation?: string;
-    object?: string;
+'use client'
+
+import { useTranslations } from 'next-intl'
+import { useTransition } from 'react'
+import { Trash2 } from 'lucide-react'
+import { toast } from 'sonner'
+import type { Tuple } from '@openfga/sdk'
+import { deleteTupleAction } from '@/actions/open-fga.action'
+import { removeTuple } from '@/stores/slice'
+import { useAppDispatch, useAppSelector } from '@/stores/store'
+import { Button } from '@/components/ui/button'
+
+export default function TupleItem({
+  user = '',
+  relation = '',
+  object = '',
+}: {
+  user?: string
+  relation?: string
+  object?: string
 }) {
-    const currentStore = useAppSelector((state) => state.storeFga.currentStore);
-    const dispatch = useAppDispatch();
-    const handleDelete = async () => {
-        const yes = confirm("Are you sure you want to delete this tuple?")
-        if (!yes || !currentStore) return;
-        const res = await deleteTuple({ id: currentStore.id, body: { user, relation, object } });
-        if (res && res.data && res.data.data.status == 200) {
-            const tuple: Tuple = {
-                key: {
-                    user,
-                    relation,
-                    object,
-                },
-                timestamp: new Date().toISOString(),
-            }
+  const t = useTranslations('playground.tuples')
+  const currentStore = useAppSelector((state) => state.storeFga.currentStore)
+  const dispatch = useAppDispatch()
+  const [isPending, startTransition] = useTransition()
 
-            dispatch(removeTuple(tuple));
-        }
-    }
-    return (
-        <div className="flex gap-4 items-center justify-between text-white border border-white/30 rounded-md p-4">
-            <div className="flex gap-10 justify-center">
-                <div className="flex flex-col gap-2 text-zinc-500 text-[11px]">
-                    <span>USER</span>
-                    <span>RELATION</span>
-                    <span>OBJECT</span>
-                </div>
-                <div className="flex flex-col gap-2 justify-between text-[11px]">
-                    <span>{user}</span>
-                    <span>{relation}</span>
-                    <span>{object}</span>
-                </div>
+  function handleDelete() {
+    if (!currentStore?.id) return
+    startTransition(async () => {
+      const res = await deleteTupleAction({ id: currentStore.id!, body: { user, relation, object } })
+      if (res?.serverError || res?.data?.error) {
+        toast.error(t('errors.deleteFailed'))
+        return
+      }
+      const tuple: Tuple = {
+        key: { user, relation, object },
+        timestamp: new Date().toISOString(),
+      }
+      dispatch(removeTuple(tuple))
+      toast.success(t('deleted'))
+    })
+  }
 
-            </div>
-            <div className="flex gap-2 items-center">
-                <InfoIcon />
-                <Button variant="ghost" size="icon" className='!bg-transparent !text-white text-sm !shadow-none' onClick={handleDelete}>
-                    <DeleteIcon />
-                </Button>
-            </div>
-
-        </div>
-    )
+  return (
+    <div className="flex items-center justify-between gap-3 rounded-md border border-border/60 bg-surface p-3 text-sm">
+      <div className="grid min-w-0 grid-cols-[60px_1fr] gap-x-3 gap-y-1 text-xs">
+        <span className="text-muted">User</span>
+        <span className="truncate font-mono">{user}</span>
+        <span className="text-muted">Relation</span>
+        <span className="truncate font-mono">{relation}</span>
+        <span className="text-muted">Object</span>
+        <span className="truncate font-mono">{object}</span>
+      </div>
+      <Button
+        variant="ghost"
+        size="icon"
+        className="size-7 shrink-0 text-muted hover:text-destructive"
+        onClick={handleDelete}
+        disabled={isPending}
+        title={t('delete')}
+      >
+        {isPending ? (
+          <span className="size-3.5 animate-spin rounded-full border-2 border-current border-t-transparent" />
+        ) : (
+          <Trash2 className="size-3.5" />
+        )}
+      </Button>
+    </div>
+  )
 }

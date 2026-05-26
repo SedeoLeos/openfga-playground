@@ -1,11 +1,7 @@
-"use client";
+'use client'
 
-import ReduxProvider from "@/stores/redux-provider";
+import ReduxProvider from '@/stores/redux-provider'
 
-export default function AppWrapper({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return <ReduxProvider>{children}</ReduxProvider>;
+export default function AppWrapper({ children }: { children: React.ReactNode }) {
+  return <ReduxProvider>{children}</ReduxProvider>
 }

@@ -1,0 +1,185 @@
+{
+  "common": {
+    "loading": "Cargando…",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "confirm": "Confirmar",
+    "close": "Cerrar",
+    "edit": "Editar",
+    "add": "Añadir",
+    "copy": "Copiar",
+    "copied": "¡Copiado!",
+    "error": "Se produjo un error",
+    "success": "Éxito",
+    "required": "Obligatorio",
+    "optional": "Opcional",
+    "search": "Buscar…",
+    "noResults": "Sin resultados.",
+    "actions": "Acciones",
+    "name": "Nombre",
+    "createdAt": "Creado el",
+    "updatedAt": "Actualizado el"
+  },
+  "nav": {
+    "playground": "Playground",
+    "settings": "Configuración",
+    "docs": "Documentación",
+    "community": "Comunidad",
+    "logout": "Cerrar sesión",
+    "profile": "Perfil"
+  },
+  "auth": {
+    "signIn": "Iniciar sesión",
+    "signUp": "Registrarse",
+    "signOut": "Cerrar sesión",
+    "email": "Correo electrónico",
+    "emailPlaceholder": "tú@ejemplo.com",
+    "password": "Contraseña",
+    "passwordPlaceholder": "••••••••",
+    "confirmPassword": "Confirmar contraseña",
+    "forgotPassword": "¿Olvidaste tu contraseña?",
+    "noAccount": "¿No tienes cuenta?",
+    "hasAccount": "¿Ya tienes cuenta?",
+    "orContinueWith": "O continúa con",
+    "continueWithGoogle": "Continuar con Google",
+    "continueWithGitHub": "Continuar con GitHub",
+    "signingIn": "Iniciando sesión…",
+    "signingUp": "Creando cuenta…",
+    "loginTitle": "Bienvenido de nuevo",
+    "loginSubtitle": "Inicia sesión en tu OpenFGA Playground",
+    "registerTitle": "Crear una cuenta",
+    "registerSubtitle": "Comienza a explorar los modelos de autorización de OpenFGA",
+    "displayName": "Nombre para mostrar",
+    "displayNamePlaceholder": "Tu nombre",
+    "errors": {
+      "invalidCredentials": "Correo o contraseña inválidos.",
+      "emailTaken": "Este correo ya está registrado.",
+      "weakPassword": "La contraseña debe tener al menos 8 caracteres.",
+      "networkError": "Error de red — inténtalo de nuevo.",
+      "oauthError": "Error en el inicio de sesión OAuth. Inténtalo de nuevo.",
+      "unknown": "Algo salió mal. Inténtalo de nuevo."
+    }
+  },
+  "playground": {
+    "title": "Playground",
+    "noStore": "Ningún store seleccionado",
+    "selectStore": "Seleccionar un store",
+    "createStore": "Nuevo store",
+    "deleteStore": "Eliminar store",
+    "storeDetails": "Detalles del store",
+    "copyStoreId": "Copiar ID del store",
+    "copyModelId": "Copiar ID del modelo",
+    "copyStoreData": "Copiar DSL",
+    "joinCommunity": "Únete a la comunidad",
+    "tabs": {
+      "tuples": "Tuplas",
+      "assertions": "Aserciones"
+    },
+    "sections": {
+      "typesPreviewer": "Vista previa de tipos",
+      "tupleQueries": "Consultas de tuplas"
+    },
+    "store": {
+      "nameLabel": "Nombre del store",
+      "namePlaceholder": "mi-store",
+      "creating": "Creando…",
+      "created": "Store creado correctamente.",
+      "deleted": "Store eliminado.",
+      "deleteConfirm": "¿Eliminar este store? Esta acción no se puede deshacer.",
+      "errors": {
+        "createFailed": "Error al crear el store.",
+        "deleteFailed": "Error al eliminar el store.",
+        "loadFailed": "Error al cargar los stores."
+      }
+    },
+    "model": {
+      "save": "Guardar modelo",
+      "saving": "Guardando…",
+      "saved": "Modelo guardado.",
+      "errors": {
+        "saveFailed": "Error al guardar el modelo.",
+        "invalidDsl": "Sintaxis DSL no válida."
+      }
+    },
+    "tuples": {
+      "user": "Usuario",
+      "relation": "Relación",
+      "object": "Objeto",
+      "add": "Añadir tupla",
+      "adding": "Añadiendo…",
+      "added": "Tupla añadida.",
+      "delete": "Eliminar tupla",
+      "deleted": "Tupla eliminada.",
+      "userPlaceholder": "user:alice",
+      "relationPlaceholder": "viewer",
+      "objectPlaceholder": "document:readme",
+      "errors": {
+        "addFailed": "Error al añadir la tupla.",
+        "deleteFailed": "Error al eliminar la tupla.",
+        "loadFailed": "Error al cargar las tuplas."
+      }
+    },
+    "assertions": {
+      "check": "Verificar",
+      "checking": "Verificando…",
+      "allowed": "Permitido",
+      "denied": "Denegado",
+      "noAssertions": "Sin aserciones todavía.",
+      "errors": {
+        "checkFailed": "Error en la verificación de la aserción.",
+        "loadFailed": "Error al cargar las aserciones."
+      }
+    }
+  },
+  "settings": {
+    "title": "Configuración",
+    "profile": {
+      "title": "Perfil",
+      "displayName": "Nombre para mostrar",
+      "email": "Correo electrónico",
+      "avatar": "Avatar",
+      "changePassword": "Cambiar contraseña",
+      "currentPassword": "Contraseña actual",
+      "newPassword": "Nueva contraseña",
+      "saving": "Guardando…",
+      "saved": "Perfil actualizado."
+    },
+    "datasources": {
+      "title": "Fuentes de datos OpenFGA",
+      "subtitle": "Configura tus conexiones al servidor OpenFGA.",
+      "add": "Añadir fuente",
+      "edit": "Editar",
+      "delete": "Eliminar",
+      "setDefault": "Establecer como predeterminado",
+      "default": "Predeterminado",
+      "noSources": "No hay fuentes de datos configuradas.",
+      "form": {
+        "name": "Nombre",
+        "namePlaceholder": "Servidor de producción",
+        "apiUrl": "URL de la API",
+        "apiUrlPlaceholder": "http://localhost:8080",
+        "apiToken": "Token de API",
+        "apiTokenPlaceholder": "Dejar vacío si no hay autenticación",
+        "defaultStoreId": "ID del store predeterminado",
+        "defaultStoreIdPlaceholder": "01ABCDEF…"
+      },
+      "errors": {
+        "saveFailed": "Error al guardar la fuente.",
+        "deleteFailed": "Error al eliminar la fuente.",
+        "loadFailed": "Error al cargar las fuentes."
+      }
+    },
+    "organization": {
+      "title": "Organización",
+      "members": "Miembros",
+      "invite": "Invitar miembro",
+      "roles": {
+        "owner": "Propietario",
+        "admin": "Administrador",
+        "member": "Miembro",
+        "viewer": "Lector"
+      }
+    }
+  }
+}

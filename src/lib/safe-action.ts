@@ -1,3 +1,3 @@
-import { createSafeActionClient } from "next-safe-action";
+import { createSafeActionClient } from 'next-safe-action'
 
-export const actionSafe = createSafeActionClient();
+export const actionSafe = createSafeActionClient()

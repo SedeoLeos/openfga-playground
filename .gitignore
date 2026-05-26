@@ -41,3 +41,8 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 databases/**
+
+# SQLite local database (standalone mode)
+local.db
+*.db-shm
+*.db-wal

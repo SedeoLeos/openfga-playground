@@ -1,0 +1,185 @@
+{
+  "common": {
+    "loading": "Chargement…",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "confirm": "Confirmer",
+    "close": "Fermer",
+    "edit": "Modifier",
+    "add": "Ajouter",
+    "copy": "Copier",
+    "copied": "Copié !",
+    "error": "Une erreur est survenue",
+    "success": "Succès",
+    "required": "Obligatoire",
+    "optional": "Optionnel",
+    "search": "Rechercher…",
+    "noResults": "Aucun résultat.",
+    "actions": "Actions",
+    "name": "Nom",
+    "createdAt": "Créé le",
+    "updatedAt": "Mis à jour le"
+  },
+  "nav": {
+    "playground": "Bac à sable",
+    "settings": "Paramètres",
+    "docs": "Documentation",
+    "community": "Communauté",
+    "logout": "Se déconnecter",
+    "profile": "Profil"
+  },
+  "auth": {
+    "signIn": "Se connecter",
+    "signUp": "Créer un compte",
+    "signOut": "Se déconnecter",
+    "email": "E-mail",
+    "emailPlaceholder": "vous@exemple.com",
+    "password": "Mot de passe",
+    "passwordPlaceholder": "••••••••",
+    "confirmPassword": "Confirmer le mot de passe",
+    "forgotPassword": "Mot de passe oublié ?",
+    "noAccount": "Pas encore de compte ?",
+    "hasAccount": "Déjà un compte ?",
+    "orContinueWith": "Ou continuer avec",
+    "continueWithGoogle": "Continuer avec Google",
+    "continueWithGitHub": "Continuer avec GitHub",
+    "signingIn": "Connexion…",
+    "signingUp": "Création du compte…",
+    "loginTitle": "Bon retour",
+    "loginSubtitle": "Connectez-vous à votre OpenFGA Playground",
+    "registerTitle": "Créer un compte",
+    "registerSubtitle": "Commencez à explorer les modèles d'autorisation OpenFGA",
+    "displayName": "Nom d'affichage",
+    "displayNamePlaceholder": "Votre nom",
+    "errors": {
+      "invalidCredentials": "E-mail ou mot de passe invalide.",
+      "emailTaken": "Cet e-mail est déjà utilisé.",
+      "weakPassword": "Le mot de passe doit contenir au moins 8 caractères.",
+      "networkError": "Erreur réseau — veuillez réessayer.",
+      "oauthError": "Échec de la connexion OAuth. Veuillez réessayer.",
+      "unknown": "Une erreur s'est produite. Veuillez réessayer."
+    }
+  },
+  "playground": {
+    "title": "Bac à sable",
+    "noStore": "Aucun store sélectionné",
+    "selectStore": "Sélectionner un store",
+    "createStore": "Nouveau store",
+    "deleteStore": "Supprimer le store",
+    "storeDetails": "Détails du store",
+    "copyStoreId": "Copier l'ID du store",
+    "copyModelId": "Copier l'ID du modèle",
+    "copyStoreData": "Copier le DSL",
+    "joinCommunity": "Rejoindre la communauté",
+    "tabs": {
+      "tuples": "Tuples",
+      "assertions": "Assertions"
+    },
+    "sections": {
+      "typesPreviewer": "Prévisualisation des types",
+      "tupleQueries": "Requêtes de tuples"
+    },
+    "store": {
+      "nameLabel": "Nom du store",
+      "namePlaceholder": "mon-store",
+      "creating": "Création…",
+      "created": "Store créé avec succès.",
+      "deleted": "Store supprimé.",
+      "deleteConfirm": "Supprimer ce store ? Cette action est irréversible.",
+      "errors": {
+        "createFailed": "Échec de la création du store.",
+        "deleteFailed": "Échec de la suppression du store.",
+        "loadFailed": "Échec du chargement des stores."
+      }
+    },
+    "model": {
+      "save": "Enregistrer le modèle",
+      "saving": "Enregistrement…",
+      "saved": "Modèle enregistré.",
+      "errors": {
+        "saveFailed": "Échec de l'enregistrement du modèle.",
+        "invalidDsl": "Syntaxe DSL invalide."
+      }
+    },
+    "tuples": {
+      "user": "Utilisateur",
+      "relation": "Relation",
+      "object": "Objet",
+      "add": "Ajouter un tuple",
+      "adding": "Ajout…",
+      "added": "Tuple ajouté.",
+      "delete": "Supprimer le tuple",
+      "deleted": "Tuple supprimé.",
+      "userPlaceholder": "user:alice",
+      "relationPlaceholder": "viewer",
+      "objectPlaceholder": "document:readme",
+      "errors": {
+        "addFailed": "Échec de l'ajout du tuple.",
+        "deleteFailed": "Échec de la suppression du tuple.",
+        "loadFailed": "Échec du chargement des tuples."
+      }
+    },
+    "assertions": {
+      "check": "Vérifier",
+      "checking": "Vérification…",
+      "allowed": "Autorisé",
+      "denied": "Refusé",
+      "noAssertions": "Aucune assertion pour l'instant.",
+      "errors": {
+        "checkFailed": "Échec de la vérification de l'assertion.",
+        "loadFailed": "Échec du chargement des assertions."
+      }
+    }
+  },
+  "settings": {
+    "title": "Paramètres",
+    "profile": {
+      "title": "Profil",
+      "displayName": "Nom d'affichage",
+      "email": "E-mail",
+      "avatar": "Avatar",
+      "changePassword": "Changer le mot de passe",
+      "currentPassword": "Mot de passe actuel",
+      "newPassword": "Nouveau mot de passe",
+      "saving": "Enregistrement…",
+      "saved": "Profil mis à jour."
+    },
+    "datasources": {
+      "title": "Sources de données OpenFGA",
+      "subtitle": "Configurez vos connexions au serveur OpenFGA.",
+      "add": "Ajouter une source",
+      "edit": "Modifier",
+      "delete": "Supprimer",
+      "setDefault": "Définir par défaut",
+      "default": "Défaut",
+      "noSources": "Aucune source de données configurée.",
+      "form": {
+        "name": "Nom",
+        "namePlaceholder": "Serveur de production",
+        "apiUrl": "URL de l'API",
+        "apiUrlPlaceholder": "http://localhost:8080",
+        "apiToken": "Token API",
+        "apiTokenPlaceholder": "Laisser vide si pas d'authentification",
+        "defaultStoreId": "ID du store par défaut",
+        "defaultStoreIdPlaceholder": "01ABCDEF…"
+      },
+      "errors": {
+        "saveFailed": "Échec de l'enregistrement de la source.",
+        "deleteFailed": "Échec de la suppression de la source.",
+        "loadFailed": "Échec du chargement des sources."
+      }
+    },
+    "organization": {
+      "title": "Organisation",
+      "members": "Membres",
+      "invite": "Inviter un membre",
+      "roles": {
+        "owner": "Propriétaire",
+        "admin": "Administrateur",
+        "member": "Membre",
+        "viewer": "Lecteur"
+      }
+    }
+  }
+}

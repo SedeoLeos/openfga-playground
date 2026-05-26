@@ -1,64 +1,70 @@
 'use client'
+
+import { useTranslations } from 'next-intl'
+import { useCallback, useEffect } from 'react'
+import { toast } from 'sonner'
 import { getAssertions, getTuples } from '@/actions/open-fga.action'
 import { setAssertionState, setTupleState } from '@/stores/slice'
 import { useAppDispatch, useAppSelector } from '@/stores/store'
-import { useCallback, useEffect } from 'react'
-import AssertionContainer from './Assertions'
-import MonacoEditor from './MonacoEditor'
-import Tuples from './Tuples'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs'
-
+import AssertionContainer from '@/components/Assertions'
+import MonacoEditor from '@/components/MonacoEditor'
+import Tuples from '@/components/Tuples'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 export default function LeftComponent() {
-    const tuples = useAppSelector((state) => state.tupleFga.tuples)
-    const assertions = useAppSelector((state) => state.assertionFga.assertions)
-    const currentStore = useAppSelector((state) => state.storeFga.currentStore)
-    const authorizationModel = useAppSelector((state) => state.authorizationModel.authorizationModel)
+  const t = useTranslations('playground')
+  const tuples = useAppSelector((state) => state.tupleFga.tuples)
+  const assertions = useAppSelector((state) => state.assertionFga.assertions)
+  const currentStore = useAppSelector((state) => state.storeFga.currentStore)
+  const authorizationModel = useAppSelector((state) => state.authorizationModel.authorizationModel)
+  const dispatch = useAppDispatch()
 
-    const dispatch = useAppDispatch();
+  const refreshAssertions = useCallback(async () => {
+    if (!currentStore?.id || !authorizationModel?.id) return
+    const { assertions: data, error } = await getAssertions(currentStore.id, authorizationModel.id)
+    if (error) toast.error(t('assertions.errors.loadFailed'))
+    else dispatch(setAssertionState(data))
+  }, [currentStore, authorizationModel, dispatch, t])
 
-    const updateAssertions = useCallback(async () => {
-        if (currentStore && authorizationModel) {
-            const assertions = await getAssertions(currentStore.id, authorizationModel.id)
-            if (assertions) dispatch(setAssertionState(assertions))
+  const refreshTuples = useCallback(async () => {
+    if (!currentStore?.id) return
+    const { tuples: data, error } = await getTuples(currentStore.id)
+    if (error) toast.error(t('tuples.errors.loadFailed'))
+    else dispatch(setTupleState(data))
+  }, [currentStore, dispatch, t])
 
-        }
-    }, [currentStore, authorizationModel, dispatch])
-    
-    
-    
-    const updateTuples = useCallback(async () => {
-        if (currentStore) {
-            const tuples = await getTuples(currentStore.id)
-            dispatch(setTupleState(tuples))
-        }
-    }, [currentStore, dispatch])
-    useEffect(() => {
-        updateAssertions()
-        updateTuples()
-    }, [currentStore, updateAssertions,updateTuples]);
-    
-    return (
-        <div className="flex-1 flex flex-col h-full min-w-[450px] overflow-hidden">
-            <MonacoEditor />
-            <div className="flex-1 px-5 overflow-hidden flex">
-                <Tabs defaultValue="tuples" className="overflow-hidden flex-1 flex flex-col">
-                    <div className="border-b-[0.5px] border-b-white/30 !p-0">
-                        <TabsList className="bg-transparent text-white  rounded-none !p-0">
-                            <TabsTrigger value="tuples" className="!bg-transparent !shadow-none  h-full data-[state=active]:text-indigo-500 data-[state=active]:border-b data-[state=active]:border-b-indigo-500 rounded-none">Tuples {`(${tuples.length})`}</TabsTrigger>
-                            <TabsTrigger value="assertions" className="!bg-transparent !shadow-none  h-full  data-[state=active]:text-indigo-500 data-[state=active]:border-b data-[state=active]:border-b-indigo-500 rounded-none" >Assertions {`(${assertions.length})`}</TabsTrigger>
-                        </TabsList>
-                    </div>
+  useEffect(() => {
+    refreshAssertions()
+    refreshTuples()
+  }, [currentStore, refreshAssertions, refreshTuples])
 
-                    <TabsContent value="tuples" className="max-h-[calc(100%-40px)]  flex overflow-hidden">
-                        <Tuples />
-                    </TabsContent>
-                    <TabsContent value="assertions" className="max-h-[calc(100%-100px)] flex flex-col gap-4  overflow-hidden">
-                        <AssertionContainer/>
-                    </TabsContent>
-
-                </Tabs>
-            </div>
-        </div>
-    )
+  return (
+    <div className="flex h-full flex-col overflow-hidden">
+      <MonacoEditor />
+      <div className="flex flex-1 overflow-hidden px-3">
+        <Tabs defaultValue="tuples" className="flex flex-1 flex-col overflow-hidden">
+          <TabsList className="h-9 shrink-0 rounded-none border-b border-border/60 bg-transparent p-0">
+            <TabsTrigger
+              value="tuples"
+              className="h-full rounded-none border-b-2 border-transparent bg-transparent px-4 text-sm text-muted shadow-none data-[state=active]:border-primary data-[state=active]:text-foreground"
+            >
+              {t('tabs.tuples')} ({tuples.length})
+            </TabsTrigger>
+            <TabsTrigger
+              value="assertions"
+              className="h-full rounded-none border-b-2 border-transparent bg-transparent px-4 text-sm text-muted shadow-none data-[state=active]:border-primary data-[state=active]:text-foreground"
+            >
+              {t('tabs.assertions')} ({assertions.length})
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="tuples" className="flex flex-1 overflow-hidden mt-0">
+            <Tuples />
+          </TabsContent>
+          <TabsContent value="assertions" className="flex flex-1 flex-col gap-3 overflow-hidden mt-0">
+            <AssertionContainer />
+          </TabsContent>
+        </Tabs>
+      </div>
+    </div>
+  )
 }

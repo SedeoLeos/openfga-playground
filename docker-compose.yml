@@ -1,0 +1,90 @@
+name: openfga-playground
+
+# Usage:
+#   Standalone (SQLite):  APP_MODE=standalone docker compose up
+#   SaaS (PostgreSQL):    APP_MODE=saas docker compose --profile saas up
+
+services:
+  # ─── OpenFGA Server ──────────────────────────────────────────────────────
+  openfga:
+    image: openfga/openfga:latest
+    container_name: openfga
+    command: run
+    environment:
+      - OPENFGA_DATASTORE_ENGINE=postgres
+      - OPENFGA_DATASTORE_URI=postgres://postgres:postgres@postgres:5432/openfga?sslmode=disable
+      - OPENFGA_AUTHN_METHOD=none
+      - OPENFGA_PLAYGROUND_ENABLED=false
+      - OPENFGA_HTTP_ADDR=0.0.0.0:8080
+    ports:
+      - '8080:8080'
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - openfga-net
+
+  openfga-migrate:
+    image: openfga/openfga:latest
+    container_name: openfga-migrate
+    command: migrate
+    environment:
+      - OPENFGA_DATASTORE_ENGINE=postgres
+      - OPENFGA_DATASTORE_URI=postgres://postgres:postgres@postgres:5432/openfga?sslmode=disable
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - openfga-net
+
+  # ─── PostgreSQL (shared: OpenFGA + SaaS app DB) ───────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: openfga-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    ports:
+      - '5432:5432'
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+    networks:
+      - openfga-net
+
+  # ─── Next.js App ─────────────────────────────────────────────────────────
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: openfga-playground-app
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=production
+      - OPENFGA_API_URL=http://openfga:8080
+    ports:
+      - '3000:3000'
+    volumes:
+      - app_data:/app/data
+    depends_on:
+      - openfga
+    restart: unless-stopped
+    networks:
+      - openfga-net
+
+volumes:
+  postgres_data:
+  app_data:
+
+networks:
+  openfga-net:
+    driver: bridge

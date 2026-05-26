@@ -1,0 +1,185 @@
+{
+  "common": {
+    "loading": "Loading…",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "confirm": "Confirm",
+    "close": "Close",
+    "edit": "Edit",
+    "add": "Add",
+    "copy": "Copy",
+    "copied": "Copied!",
+    "error": "An error occurred",
+    "success": "Success",
+    "required": "Required",
+    "optional": "Optional",
+    "search": "Search…",
+    "noResults": "No results found.",
+    "actions": "Actions",
+    "name": "Name",
+    "createdAt": "Created at",
+    "updatedAt": "Updated at"
+  },
+  "nav": {
+    "playground": "Playground",
+    "settings": "Settings",
+    "docs": "Docs",
+    "community": "Community",
+    "logout": "Sign out",
+    "profile": "Profile"
+  },
+  "auth": {
+    "signIn": "Sign in",
+    "signUp": "Sign up",
+    "signOut": "Sign out",
+    "email": "Email",
+    "emailPlaceholder": "you@example.com",
+    "password": "Password",
+    "passwordPlaceholder": "••••••••",
+    "confirmPassword": "Confirm password",
+    "forgotPassword": "Forgot password?",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "orContinueWith": "Or continue with",
+    "continueWithGoogle": "Continue with Google",
+    "continueWithGitHub": "Continue with GitHub",
+    "signingIn": "Signing in…",
+    "signingUp": "Signing up…",
+    "loginTitle": "Welcome back",
+    "loginSubtitle": "Sign in to your OpenFGA Playground",
+    "registerTitle": "Create an account",
+    "registerSubtitle": "Start exploring OpenFGA authorization models",
+    "displayName": "Display name",
+    "displayNamePlaceholder": "Your name",
+    "errors": {
+      "invalidCredentials": "Invalid email or password.",
+      "emailTaken": "This email is already registered.",
+      "weakPassword": "Password must be at least 8 characters.",
+      "networkError": "Network error — please try again.",
+      "oauthError": "OAuth sign-in failed. Please try again.",
+      "unknown": "Something went wrong. Please try again."
+    }
+  },
+  "playground": {
+    "title": "Playground",
+    "noStore": "No store selected",
+    "selectStore": "Select a store",
+    "createStore": "New store",
+    "deleteStore": "Delete store",
+    "storeDetails": "Store details",
+    "copyStoreId": "Copy Store ID",
+    "copyModelId": "Copy Model ID",
+    "copyStoreData": "Copy DSL",
+    "joinCommunity": "Join the community",
+    "tabs": {
+      "tuples": "Tuples",
+      "assertions": "Assertions"
+    },
+    "sections": {
+      "typesPreviewer": "Types Previewer",
+      "tupleQueries": "Tuple queries"
+    },
+    "store": {
+      "nameLabel": "Store name",
+      "namePlaceholder": "my-store",
+      "creating": "Creating…",
+      "created": "Store created successfully.",
+      "deleted": "Store deleted.",
+      "deleteConfirm": "Delete this store? This action cannot be undone.",
+      "errors": {
+        "createFailed": "Failed to create store.",
+        "deleteFailed": "Failed to delete store.",
+        "loadFailed": "Failed to load stores."
+      }
+    },
+    "model": {
+      "save": "Save model",
+      "saving": "Saving…",
+      "saved": "Model saved.",
+      "errors": {
+        "saveFailed": "Failed to save model.",
+        "invalidDsl": "Invalid DSL syntax."
+      }
+    },
+    "tuples": {
+      "user": "User",
+      "relation": "Relation",
+      "object": "Object",
+      "add": "Add tuple",
+      "adding": "Adding…",
+      "added": "Tuple added.",
+      "delete": "Remove tuple",
+      "deleted": "Tuple removed.",
+      "userPlaceholder": "user:alice",
+      "relationPlaceholder": "viewer",
+      "objectPlaceholder": "document:readme",
+      "errors": {
+        "addFailed": "Failed to add tuple.",
+        "deleteFailed": "Failed to remove tuple.",
+        "loadFailed": "Failed to load tuples."
+      }
+    },
+    "assertions": {
+      "check": "Check",
+      "checking": "Checking…",
+      "allowed": "Allowed",
+      "denied": "Denied",
+      "noAssertions": "No assertions yet.",
+      "errors": {
+        "checkFailed": "Assertion check failed.",
+        "loadFailed": "Failed to load assertions."
+      }
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "profile": {
+      "title": "Profile",
+      "displayName": "Display name",
+      "email": "Email",
+      "avatar": "Avatar",
+      "changePassword": "Change password",
+      "currentPassword": "Current password",
+      "newPassword": "New password",
+      "saving": "Saving…",
+      "saved": "Profile updated."
+    },
+    "datasources": {
+      "title": "OpenFGA Datasources",
+      "subtitle": "Configure your OpenFGA server connections.",
+      "add": "Add datasource",
+      "edit": "Edit",
+      "delete": "Delete",
+      "setDefault": "Set as default",
+      "default": "Default",
+      "noSources": "No datasources configured yet.",
+      "form": {
+        "name": "Name",
+        "namePlaceholder": "Production server",
+        "apiUrl": "API URL",
+        "apiUrlPlaceholder": "http://localhost:8080",
+        "apiToken": "API Token",
+        "apiTokenPlaceholder": "Leave empty if no auth",
+        "defaultStoreId": "Default Store ID",
+        "defaultStoreIdPlaceholder": "01ABCDEF…"
+      },
+      "errors": {
+        "saveFailed": "Failed to save datasource.",
+        "deleteFailed": "Failed to delete datasource.",
+        "loadFailed": "Failed to load datasources."
+      }
+    },
+    "organization": {
+      "title": "Organization",
+      "members": "Members",
+      "invite": "Invite member",
+      "roles": {
+        "owner": "Owner",
+        "admin": "Admin",
+        "member": "Member",
+        "viewer": "Viewer"
+      }
+    }
+  }
+}

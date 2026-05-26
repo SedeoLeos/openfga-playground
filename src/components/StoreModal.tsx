@@ -1,26 +1,35 @@
 'use client'
-import React, { useState } from 'react'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog'
-import { Button } from './ui/button'
-import {  useAppSelector } from '@/stores/store'
-import { StoreDataTable } from './tables/stores/data-table'
-import { StoreColumns } from './tables/stores/column'
+
+import { useState } from 'react'
+import { useTranslations } from 'next-intl'
+import { List } from 'lucide-react'
+import { useAppSelector } from '@/stores/store'
+import { Button } from '@/components/ui/button'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { StoreDataTable } from '@/components/tables/stores/data-table'
+import { StoreColumns } from '@/components/tables/stores/column'
 
 export default function StoreViewModal() {
-    const storeFgaState = useAppSelector((state) => state.storeFga.store);
-    const [open, setOpen] = useState(false);
+  const t = useTranslations('playground')
+  const stores = useAppSelector((state) => state.storeFga.store)
+  const [open, setOpen] = useState(false)
 
-    return (
-        <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-                <Button className='' type='button' onClick={() => setOpen(true)}>Views STORE</Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[755px] bg-[#282828] !border-none p-5 text-white max-h-[600px] flex flex-col">
-                <DialogHeader className='flex justify-center items-center'>
-                    <DialogTitle>List store</DialogTitle>
-                </DialogHeader>
-                <StoreDataTable data={storeFgaState} columns={StoreColumns}/>
-            </DialogContent>
-        </Dialog>
-    )
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant="outline" size="sm" className="gap-1.5">
+          <List className="size-3.5" />
+          <span className="hidden sm:inline">{t('storeDetails')}</span>
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="flex max-h-[80vh] flex-col sm:max-w-2xl">
+        <DialogHeader>
+          <DialogTitle>{t('storeDetails')}</DialogTitle>
+        </DialogHeader>
+        <div className="flex-1 overflow-auto">
+          <StoreDataTable data={stores} columns={StoreColumns} />
+        </div>
+      </DialogContent>
+    </Dialog>
+  )
 }

@@ -1,30 +1,32 @@
-import { clsx, type ClassValue } from "clsx";
-import { twMerge } from "tailwind-merge";
+import { clsx, type ClassValue } from 'clsx'
+import { twMerge } from 'tailwind-merge'
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
-export const copyToClipboard = async (text: string) => {
-  try {
-     
-      await navigator.clipboard.writeText(text);
-      return true;
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  } catch (err) {
-      // Fallback pour les navigateurs qui ne supportent pas l'API Clipboard
-      try {
-          const textarea = document.createElement('textarea');
-          textarea.value = text;
-          textarea.style.position = 'fixed';
-          textarea.style.opacity = '0';
-          document.body.appendChild(textarea);
-          textarea.select();
-          const result = document.execCommand('copy');
-          document.body.removeChild(textarea);
-          return result;
-      } catch (err) {
-          console.error('Impossible de copier le texte:', err);
-          return false;
-      }
-  }
+
+export function copyToClipboard(text: string): void {
+  if (typeof window === 'undefined') return
+  navigator.clipboard.writeText(text).catch(() => {
+    const el = document.createElement('textarea')
+    el.value = text
+    el.style.position = 'fixed'
+    el.style.opacity = '0'
+    document.body.appendChild(el)
+    el.select()
+    document.execCommand('copy')
+    document.body.removeChild(el)
+  })
+}
+
+export function slugify(str: string): string {
+  return str
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+}
+
+export function truncate(str: string, maxLength: number): string {
+  if (str.length <= maxLength) return str
+  return str.slice(0, maxLength - 1) + '…'
 }

@@ -1,42 +1,46 @@
-import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
-import { jwtVerify } from 'jose'
+import { routing } from '@/i18n/routing'
+import createMiddleware from 'next-intl/middleware'
+import { NextRequest, NextResponse } from 'next/server'
 
-const secret = new TextEncoder().encode(
-  process.env.JWT_SECRET || 'secret'
-)
+const intlMiddleware = createMiddleware(routing)
 
-export async function middleware(request: NextRequest) {
-    const cookiesHeader = request.headers.get("cookie");
-    if (!cookiesHeader) return NextResponse.redirect(new URL('/', request.url))
+const protectedPaths = ['/playground', '/settings']
 
-    const cookies = Object.fromEntries(
-        cookiesHeader.split(";").map((cookie) => cookie.trim().split("="))
-    );
-    const token = cookies['token']
-    if (!token) return NextResponse.redirect(new URL('/', request.url))
-    
-    try {
-        const { payload } = await jwtVerify(token, secret)
+function isProtectedPath(pathname: string): boolean {
+  const stripped = pathname.replace(/^\/(fr|es)/, '')
+  return protectedPaths.some((p) => stripped === p || stripped.startsWith(p + '/'))
+}
 
-        if (!payload) {
-            return NextResponse.redirect(new URL('/', request.url))
-        }
+export function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl
 
-        // Check if token has expired
-        const currentTimestamp = Math.floor(Date.now() / 1000)
-        if (payload.exp && payload.exp < currentTimestamp) {
-            console.error('Token has expired')
-            return NextResponse.redirect(new URL('/', request.url))
-        }
+  // Skip internal Next.js / static routes
+  if (
+    pathname.startsWith('/_next') ||
+    pathname.startsWith('/api') ||
+    pathname.includes('.')
+  ) {
+    return NextResponse.next()
+  }
 
-        return NextResponse.next()
-    } catch (e) {
-        console.error('Token verification failed:', e)
-        return NextResponse.redirect(new URL('/', request.url))
+  // Lightweight session check via cookie (full verification happens in server components)
+  if (isProtectedPath(pathname)) {
+    const sessionCookie =
+      request.cookies.get('better-auth.session_token') ??
+      request.cookies.get('better-auth.session-token')
+
+    if (!sessionCookie) {
+      const locale = pathname.match(/^\/(fr|es)/)?.[1] ?? ''
+      const loginPath = locale ? `/${locale}/login` : '/login'
+      return NextResponse.redirect(new URL(loginPath, request.url))
     }
+  }
+
+  return intlMiddleware(request)
 }
 
 export const config = {
-    matcher: '/playground/:path*',
+  matcher: [
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+  ],
 }

@@ -1,0 +1,21 @@
+# Development override — mounts source code, disables the app container (run Next.js locally)
+# Usage: docker compose -f docker-compose.yml -f docker-compose.dev.yml up postgres openfga
+
+name: openfga-playground
+
+services:
+  postgres:
+    ports:
+      - '5432:5432'
+
+  openfga:
+    ports:
+      - '8080:8080'
+      - '8081:8081'
+    environment:
+      - OPENFGA_HTTP_ADDR=0.0.0.0:8080
+      - OPENFGA_GRPC_ADDR=0.0.0.0:8081
+
+  app:
+    profiles:
+      - disabled

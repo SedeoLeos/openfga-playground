@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import ChevronIcon from '../icons/Chevron';
+import { ChevronDown } from 'lucide-react'
 
 type AccordionContextType = {
   activeItem: string;
@@ -94,7 +94,7 @@ export function CustomAccordionTrigger({
       onClick={handleClick}
     >
       {children}
-      <ChevronIcon className={`transition-transform duration-200 ${isOpen ? 'opacity-0' : 'opacity-100'}`} />
+      <ChevronDown className={`ml-auto size-4 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
     </button>
   );
 }
